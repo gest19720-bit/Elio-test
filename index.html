@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elio — The calm behind your business</title>
+<meta name="description" content="Elio is the AI back-office agent for the follow-ups, admin, and small tasks that keep your business moving." />
+<meta property="og:title" content="Elio — The calm behind your business" />
+<meta property="og:description" content="The AI back-office agent for the work that keeps getting pushed to tomorrow." />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============ Tokens ============ */
+  :root{
+    --navy:#14213D;
+    --navy-deep:#0F1930;
+    --blue:#2563EB;
+    --blue-light:#60A5FA;
+    --paper:#F8FAFC;
+    --paper-warm:#F2EFE9;
+    --ink:#0F172A;
+    --muted:#64748B;
+    --line: rgba(15,23,42,.10);
+    --line-on-navy: rgba(248,250,252,.14);
+    --card:#FFFFFF;
+    --radius: 3px;
+    --serif-tight: -0.01em;
+    --max: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    margin:0;
+    letter-spacing:var(--serif-tight);
+  }
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  .container{max-width:var(--max); margin:0 auto; padding:0 32px;}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--blue-light);
+    outline-offset:3px;
+  }
+
+  /* ============ Nav ============ */
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(20,33,61,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line-on-navy);
+  }
+  .navbar-inner{
+    max-width:var(--max); margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:9px; color:var(--paper);}
+  .brand-mark{
+    width:30px; height:30px; border-radius:7px;
+    object-fit:cover;
+  }
+  .brand-word{font-family:'Poppins',sans-serif; font-weight:600; font-size:17px;}
+  .nav-links{display:flex; gap:34px;}
+  .nav-links a{color:rgba(248,250,252,.72); font-size:14.5px; transition:color .15s;}
+  .nav-links a:hover{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:18px;}
+  .nav-toggle{display:none; background:none; border:none; width:32px; height:22px; position:relative;}
+  .nav-toggle span{position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;}
+  .nav-toggle span:nth-child(1){top:0;} .nav-toggle span:nth-child(2){top:10px;} .nav-toggle span:nth-child(3){top:20px;}
+  .mobile-menu{display:none;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 22px; font-size:14.5px; font-weight:500;
+    border-radius:var(--radius); border:1px solid transparent;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn-primary{background:var(--blue); color:#fff;}
+  .btn-primary:hover{background:#1d4fd1;}
+  .btn-ghost{border-color:var(--line-on-navy); color:var(--paper);}
+  .btn-ghost:hover{border-color:rgba(248,250,252,.4);}
+  .btn-dark{border-color:var(--line); color:var(--ink);}
+  .btn-dark:hover{border-color:var(--muted);}
+  .btn-block{width:100%; justify-content:center;}
+
+  /* ============ Hero ============ */
+  .hero{
+    background:var(--navy);
+    color:var(--paper);
+    padding:96px 0 88px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.05fr .95fr; gap:64px; align-items:center;
+  }
+  .status-line{
+    display:flex; align-items:center; gap:9px;
+    font-size:13.5px; color:rgba(248,250,252,.6); margin-bottom:26px;
+  }
+  .status-dot{width:6px; height:6px; border-radius:50%; background:var(--blue-light);
+    box-shadow:0 0 0 4px rgba(96,165,250,.18);}
+  .hero h1{
+    font-size:clamp(2.6rem, 4.4vw, 3.6rem);
+    line-height:1.1;
+    max-width:11.5ch;
+    font-weight:600;
+  }
+  .hero-description{
+    margin-top:22px; max-width:44ch;
+    font-size:1.08rem; color:rgba(248,250,252,.72);
+  }
+  .hero-actions{display:flex; align-items:center; gap:26px; margin-top:34px;}
+  .text-link{font-size:14.5px; color:rgba(248,250,252,.75); border-bottom:1px solid rgba(248,250,252,.3); padding-bottom:2px;}
+  .text-link:hover{color:#fff; border-color:#fff;}
+
+  /* the ledger card: a physical-feeling receipt/index-card instead of a dashboard mock */
+  .ledger-wrap{display:flex; justify-content:center;}
+  .ledger{
+    width:100%; max-width:340px;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:2px;
+    padding:26px 26px 22px;
+    transform:rotate(2deg);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.45);
+    position:relative;
+  }
+  .ledger::before{
+    content:"";
+    position:absolute; inset:10px;
+    border:1px dashed rgba(15,23,42,.14);
+    pointer-events:none;
+  }
+  .ledger-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'Poppins',sans-serif; font-size:12px; font-weight:600;
+    color:var(--muted); padding-bottom:14px; border-bottom:1px solid var(--line);
+    margin-bottom:16px;
+  }
+  .ledger-head span:last-child{color:var(--blue);}
+  .ledger-greet{font-size:14px; color:var(--muted); margin-bottom:16px;}
+  .ledger-greet strong{color:var(--ink); font-weight:600;}
+  .ledger-row{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 0; border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .ledger-row:last-of-type{border-bottom:none;}
+  .ledger-check{color:var(--blue); font-weight:600; margin-top:1px;}
+  .ledger-row .r-label{flex:1;}
+  .ledger-row .r-time{color:var(--muted); font-size:12px; white-space:nowrap;}
+  .ledger-foot{
+    margin-top:16px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--muted); display:flex; justify-content:space-between;
+  }
+  .tape{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:80px; height:24px; background:rgba(248,250,252,.5);
+    border:1px solid rgba(255,255,255,.6);
+  }
+
+  /* ============ Proof strip ============ */
+  .proof-strip{padding:38px 0; border-bottom:1px solid var(--line);}
+  .proof-inner{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;
+  }
+  .proof-inner > span{font-size:13.5px; color:var(--muted);}
+  .proof-inner > div{display:flex; gap:30px; flex-wrap:wrap;}
+  .proof-inner > div span{font-family:'Poppins',sans-serif; font-size:14.5px; font-weight:500; color:var(--ink);}
+
+  /* ============ Section shell ============ */
+  .section{padding:110px 0;}
+  .section-tinted{background:var(--paper-warm);}
+  .section-heading{max-width:640px; margin-bottom:64px;}
+  .section-heading h2{font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600;}
+  .section-heading p{margin-top:16px; color:var(--muted); font-size:1.05rem; max-width:52ch;}
+
+  /* ============ Feature list (editorial, not identical cards) ============ */
+  .feature-list{display:flex; flex-direction:column;}
+  .feature-row{
+    display:grid; grid-template-columns:220px 1fr 1fr;
+    gap:40px;
+    padding:40px 0;
+    border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .feature-list .feature-row:last-child{border-bottom:1px solid var(--line);}
+  .feature-tag{
+    font-family:'Poppins',sans-serif; font-size:13px; color:var(--blue); font-weight:600;
+    padding-top:4px;
+  }
+  .feature-row h3{font-size:1.3rem; font-weight:600; max-width:16ch;}
+  .feature-row .feature-text{color:var(--muted); max-width:46ch; padding-top:4px;}
+
+  /* ============ How it works — real sequence, connected line ============ */
+  .timeline{display:flex; flex-direction:column;}
+  .timeline-step{
+    display:grid; grid-template-columns:64px 1fr;
+    gap:28px;
+    position:relative;
+    padding-bottom:52px;
+  }
+  .timeline-step:last-child{padding-bottom:0;}
+  .timeline-marker{
+    width:40px; height:40px; border-radius:50%;
+    border:1.5px solid var(--navy);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:14px;
+    background:var(--paper);
+    z-index:1;
+  }
+  .timeline-step:not(:last-child)::before{
+    content:"";
+    position:absolute; left:20px; top:40px; bottom:0;
+    width:1px; background:var(--line);
+  }
+  .timeline-body h3{font-size:1.2rem; font-weight:600; margin-bottom:8px;}
+  .timeline-body p{color:var(--muted); max-width:52ch;}
+
+  .control-callout{
+    margin-top:56px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+    padding:26px 30px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  .control-callout strong{font-family:'Poppins',sans-serif; font-weight:600; display:block; margin-bottom:4px;}
+  .control-callout p{color:var(--muted); font-size:14.5px;}
+  .control-pill{
+    font-size:12.5px; color:var(--blue); border:1px solid rgba(37,99,235,.3);
+    padding:6px 14px; border-radius:20px; white-space:nowrap;
+  }
+
+  /* ============ Quote ============ */
+  .quote-section{background:var(--navy); color:var(--paper); padding:100px 0;}
+  .quote-grid{max-width:760px; margin:0 auto; text-align:left;}
+  blockquote{
+    font-family:'Poppins',sans-serif; font-size:clamp(1.5rem,2.6vw,2.1rem);
+    font-weight:500; line-height:1.35; margin:0 0 20px;
+  }
+  .quote-section p{color:rgba(248,250,252,.62); font-size:1.02rem;}
+
+  /* ============ FAQ ============ */
+  .faq-list{border-top:1px solid var(--line);}
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-question{
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    background:none; border:none; padding:24px 0; text-align:left;
+    font-family:'Poppins',sans-serif; font-size:1.05rem; font-weight:500; color:var(--ink);
+  }
+  .faq-icon{font-size:1.3rem; color:var(--muted); transition:transform .2s;}
+  .faq-item.is-open .faq-icon{transform:rotate(45deg); color:var(--blue);}
+  .faq-answer{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+  .faq-answer p{padding-bottom:24px; color:var(--muted); max-width:60ch;}
+
+  /* ============ Final CTA ============ */
+  .cta-section{background:var(--navy); color:var(--paper); padding:110px 0;}
+  .final-cta{max-width:560px;}
+  .final-cta h2{color:var(--paper); font-size:clamp(2rem,3.4vw,2.7rem); font-weight:600;}
+  .final-cta p{margin-top:18px; color:rgba(248,250,252,.68); font-size:1.05rem; max-width:44ch;}
+  .final-cta .btn{margin-top:32px;}
+
+  /* ============ Footer ============ */
+  .site-footer{background:var(--navy-deep); color:rgba(248,250,252,.55); padding:44px 0;}
+  .footer-inner{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;}
+  .footer-inner .brand{color:#fff;}
+  .footer-links{display:flex; gap:22px; font-size:13.5px;}
+  .footer-links a:hover{color:#fff;}
+  .site-footer small{font-size:12.5px; display:block; margin-top:6px; color:rgba(248,250,252,.4);}
+
+  /* ============ Responsive ============ */
+  @media (max-width: 900px){
+    .hero-grid{grid-template-columns:1fr; gap:56px;}
+    .ledger{transform:rotate(0);}
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+    .feature-row{grid-template-columns:1fr; gap:12px;}
+    .proof-inner{flex-direction:column; align-items:flex-start;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    .section{padding:76px 0;}
+    .hero{padding:64px 0 60px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="brand" aria-label="Elio home">
+<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">elio</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#how-it-works">How it works</a>
+        <a href="#what-elio-does">What Elio handles</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="login.html" class="text-link">Sign in</a>
+        <a href="signup.html" class="btn btn-primary">Try the MVP</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" style="background:var(--navy); padding:0 32px 24px; flex-direction:column; gap:16px; display:none;">
+      <a href="#how-it-works" style="color:rgba(248,250,252,.8); padding:8px 0;">How it works</a>
+      <a href="#what-elio-does" style="color:rgba(248,250,252,.8); padding:8px 0;">What Elio handles</a>
+      <a href="#faq" style="color:rgba(248,250,252,.8); padding:8px 0;">FAQ</a>
+      <a href="login.html" class="text-link" style="color:rgba(248,250,252,.8); padding:8px 0;">Sign in</a>
+      <a href="signup.html" class="btn btn-primary btn-block">Try the MVP</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="status-line"><span class="status-dot"></span> In private build — the founding group shapes what ships first</div>
+          <h1>The calm behind your business.</h1>
+          <p class="hero-description">Elio takes care of the follow-ups, admin, and small-but-important work that keeps getting pushed to tomorrow.</p>
+          <div class="hero-actions">
+            <a href="signup.html" class="btn btn-primary">Try the MVP</a>
+            <a href="waitlist.html" class="text-link">Join the founding group</a>
+            <a href="#how-it-works" class="text-link">See how it works</a>
+          </div>
+        </div>
+        <div class="ledger-wrap">
+          <div class="ledger">
+            <div class="tape"></div>
+            <div class="ledger-head"><span>ELIO — TODAY</span><span>Quietly working</span></div>
+            <div class="ledger-greet">Good morning, <strong>Alex.</strong><br>Here's what needed your attention.</div>
+            <div class="ledger-row"><span class="ledger-check">✓</span><span class="r-label">Drafted a follow-up for Northstar Studio</span><span class="r-time">9:12</span></div>
+            <div class="ledger-row"><span class="ledger-check">✓</span><span class="r-label">Cleared Friday's calendar conflicts</span><span class="r-time">8:48</span></div>
+            <div class="ledger-row"><span class="ledger-check">○</span><span class="r-label">Invoice #1048 waiting on your approval</span><span class="r-time">now</span></div>
+            <div class="ledger-foot"><span>3 things handled overnight</span><span>1 needs you</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROOF STRIP -->
+    <section class="proof-strip">
+      <div class="container proof-inner">
+        <span>Built for people who run the business</span>
+        <div><span>Agencies</span><span>Consultants</span><span>Service teams</span><span>Local businesses</span></div>
+      </div>
+    </section>
+
+    <!-- WHAT ELIO DOES -->
+    <section class="section section-tinted" id="what-elio-does">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Let the busywork stop being yours.</h2>
+          <p>Elio is designed for the operational details that matter, but shouldn't require your constant attention.</p>
+        </div>
+        <div class="feature-list">
+          <div class="feature-row">
+            <div class="feature-tag">Follow-ups</div>
+            <h3>Keep conversations moving.</h3>
+            <p class="feature-text">Draft thoughtful follow-ups, surface what needs a reply, and keep good relationships warm without living in your inbox.</p>
+          </div>
+          <div class="feature-row">
+            <div class="feature-tag">Payments</div>
+            <h3>Stay ahead of what's owed.</h3>
+            <p class="feature-text">See what's overdue, what's coming due, and which reminders are ready to send — you approve, Elio prepares.</p>
+          </div>
+          <div class="feature-row">
+            <div class="feature-tag">Scheduling</div>
+            <h3>Make room on your calendar.</h3>
+            <p class="feature-text">Turn scattered requests into clear next steps and a day you can actually see, instead of a dozen open threads.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-heading">
+          <h2>A second pair of hands, on your terms.</h2>
+          <p>Elio is built to fit into the way you already work — not to ask you to build a new one.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-step">
+            <div class="timeline-marker">1</div>
+            <div class="timeline-body">
+              <h3>Connect your world</h3>
+              <p>Bring the tools you already use. Planned integrations will meet you where the work already happens.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-marker">2</div>
+            <div class="timeline-body">
+              <h3>Set the boundaries</h3>
+              <p>Choose what Elio can suggest, prepare, or handle on its own — and what always waits for you.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-marker">3</div>
+            <div class="timeline-body">
+              <h3>Get your time back</h3>
+              <p>Review the things that matter. Let the repeatable things move forward without you.</p>
+            </div>
+          </div>
+        </div>
+        <div class="control-callout">
+          <div>
+            <strong>You're always in control.</strong>
+            <p>Elio is built around visibility and approval — no black-box actions, no surprises.</p>
+          </div>
+          <span class="control-pill">Human-approved by default</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="quote-section">
+      <div class="container quote-grid">
+        <blockquote>Being the person who remembers everything isn't a business strategy.</blockquote>
+        <p>Elio is for the owner who wants to focus on the work only they can do.</p>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section faq-section" id="faq">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Questions, answered honestly.</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false"><span>Is Elio available yet?</span><span class="faq-icon">+</span></button>
+            <div class="faq-answer"><p>Not yet. Elio is currently in private build. The waitlist is for people who want to help shape what gets built first and hear when early access opens.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false"><span>What kind of work will Elio handle?</span><span class="faq-icon">+</span></button>
+            <div class="faq-answer"><p>We're starting with the repeatable back-office work that drains attention: follow-ups, payment reminders, scheduling, and daily business admin.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false"><span>Will Elio send things without my approval?</span><span class="faq-icon">+</span></button>
+            <div class="faq-answer"><p>Elio is being designed with clear control levels. Important actions can stay behind your approval, and every action should be visible and reviewable.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false"><span>Which tools will it connect to?</span><span class="faq-icon">+</span></button>
+            <div class="faq-answer"><p>Planned integrations include email, calendars, payments, messaging, and accounting tools. They aren't live yet — the waitlist helps us prioritize the right ones.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="final-cta">
+          <h2>Build a calmer business with us.</h2>
+          <p>Join the founding group and help decide what Elio learns to handle first.</p>
+          <a href="waitlist.html" class="btn btn-primary">Join the waitlist</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+<a href="index.html" class="brand"><img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" /><span class="brand-word">elio</span></a>
+        <small>Less busywork. More business. © 2026 Elio.</small>
+      </div>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.style.display === 'flex';
+      mobileMenu.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+      question.addEventListener('click', () => {
+        const isOpen = item.classList.contains('is-open');
+        document.querySelectorAll('.faq-item').forEach(other => {
+          other.classList.remove('is-open');
+          other.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          other.querySelector('.faq-answer').style.maxHeight = null;
+        });
+        if (!isOpen) {
+          item.classList.add('is-open');
+          question.setAttribute('aria-expanded', 'true');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
