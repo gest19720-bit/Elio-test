@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Elio</title>
+  <meta name="description" content="Get in touch with the Elio team." />
+<link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="responsive.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="brand">
+<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">Elio</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="index.html#what-elio-does">What Elio Does</a>
+        <a href="index.html#integrations">Integrations</a>
+        <a href="index.html#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="waitlist.html" class="btn btn-primary">Join the Waitlist →</a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" aria-label="Mobile">
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#what-elio-does">What Elio Does</a>
+      <a href="index.html#integrations">Integrations</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="waitlist.html" class="btn btn-primary btn-block">Join the Waitlist →</a>
+    </nav>
+  </header>
+
+  <main class="contact-form">
+    <div class="section-header" style="text-align:left; margin-bottom:32px;">
+      <h1 class="section-title">Get in Touch</h1>
+      <p class="section-subtitle">Have a question about Elio? Send us a message below.</p>
+    </div>
+
+    <form id="contact-form">
+      <div class="form-field">
+        <label for="contact-name">Full Name</label>
+        <input type="text" id="contact-name" name="name" required />
+      </div>
+      <div class="form-field">
+        <label for="contact-email">Email Address</label>
+        <input type="email" id="contact-email" name="email" required />
+      </div>
+      <div class="form-field">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+      <p id="contact-status" style="margin-top:16px; font-size:0.9rem; color:var(--secondary-text); display:none;">
+        Thanks for reaching out — this is a placeholder confirmation for the pre-launch site.
+      </p>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 Elio. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+<script src="main.js"></script>
+  <script>
+    // Placeholder handler: this pre-launch site has no backend for
+    // contact messages yet, so we simply show a confirmation note.
+    document.getElementById("contact-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      document.getElementById("contact-status").style.display = "block";
+      event.target.reset();
+    });
+  </script>
+</body>
+</html>

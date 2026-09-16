@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're on the List — Elio</title>
+  <meta name="description" content="You're officially on the Elio waitlist. Invite other business owners to move up the list." />
+<link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="waitlist.css" />
+<link rel="stylesheet" href="responsive.css" />
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="brand">
+<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">Elio</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="index.html#what-elio-does">What Elio Does</a>
+        <a href="index.html#integrations">Integrations</a>
+        <a href="index.html#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-secondary">Back to Home</a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" aria-label="Mobile">
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#what-elio-does">What Elio Does</a>
+      <a href="index.html#integrations">Integrations</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="index.html" class="btn btn-secondary btn-block">Back to Home</a>
+    </nav>
+  </header>
+
+  <main class="success-page">
+    <div class="container">
+
+      <div class="success-hero">
+        <!-- Replace this placeholder with the official Elio mascot -->
+        <div class="mascot-placeholder">Elio mascot</div>
+        <div class="success-icon" aria-hidden="true">🎉</div>
+        <h1>You're Officially on the List!</h1>
+        <p>
+          Thanks for joining the early Elio community. You're now one step closer to having
+          your own AI Back-Office Agent.
+        </p>
+      </div>
+
+      <div class="next-steps-grid">
+        <div class="card reveal">
+          <div class="card-icon">📬</div>
+          <h3 class="card-title">Stay Updated</h3>
+          <p class="card-text">We'll share important updates as Elio develops.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon">🚀</div>
+          <h3 class="card-title">Get Early Access</h3>
+          <p class="card-text">Early waitlist members may receive priority access.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon">🧭</div>
+          <h3 class="card-title">Help Shape Elio</h3>
+          <p class="card-text">Your feedback will help us decide what Elio builds first.</p>
+        </div>
+      </div>
+
+      <div class="referral-section">
+        <h2>Move Up the Waitlist.</h2>
+        <p>Invite other business owners to join Elio and get closer to early access.</p>
+
+        <div class="referral-link-box">
+          <label for="referral-link-input" class="visually-hidden">Your referral link</label>
+          <input type="text" id="referral-link-input" readonly />
+          <button type="button" class="btn btn-secondary" id="copy-referral-btn">Copy</button>
+        </div>
+
+        <div class="referral-rewards">
+          <div class="reward-card">
+            <span class="reward-count">1 invite</span>
+            <span class="reward-name">Priority Access</span>
+          </div>
+          <div class="reward-card">
+            <span class="reward-count">3 invites</span>
+            <span class="reward-name">Early Access</span>
+          </div>
+          <div class="reward-card">
+            <span class="reward-count">5 invites</span>
+            <span class="reward-name">VIP Early Access</span>
+          </div>
+        </div>
+
+        <div class="referral-progress">
+          <span id="referral-count-label">0 / 5 Referrals</span>
+          <div class="progress-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+
+        <div class="share-buttons">
+          <button type="button" class="share-btn" id="native-share-btn">📤 Share</button>
+          <a href="#" class="share-btn" id="share-whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="#" class="share-btn" id="share-twitter" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="#" class="share-btn" id="share-linkedin" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 Elio. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+<script src="main.js"></script>
+<script src="supabase.js"></script>
+<script src="referral.js"></script>
+</body>
+</html>

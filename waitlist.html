@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Join the Elio Founding Group</title>
+<meta name="description" content="Join the founding group helping shape Elio, the AI back-office agent for small businesses." />
+<link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============ Tokens (shared with index.html) ============ */
+  :root{
+    --navy:#14213D;
+    --navy-deep:#0F1930;
+    --blue:#2563EB;
+    --blue-light:#60A5FA;
+    --paper:#F8FAFC;
+    --paper-warm:#F2EFE9;
+    --ink:#0F172A;
+    --muted:#64748B;
+    --line: rgba(15,23,42,.10);
+    --line-on-navy: rgba(248,250,252,.14);
+    --card:#FFFFFF;
+    --error:#B42318;
+    --radius: 3px;
+    --serif-tight: -0.01em;
+    --max: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    margin:0;
+    letter-spacing:var(--serif-tight);
+  }
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  .container{max-width:var(--max); margin:0 auto; padding:0 32px;}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--blue-light);
+    outline-offset:3px;
+  }
+
+  /* ============ Nav ============ */
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(20,33,61,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line-on-navy);
+  }
+  .navbar-inner{
+    max-width:var(--max); margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:9px; color:var(--paper);}
+  .brand-mark{
+    width:30px; height:30px; border-radius:7px;
+    object-fit:cover;
+  }
+  .brand-word{font-family:'Poppins',sans-serif; font-weight:600; font-size:17px;}
+  .nav-links{display:flex; gap:34px;}
+  .nav-links a{color:rgba(248,250,252,.72); font-size:14.5px; transition:color .15s;}
+  .nav-links a:hover{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:18px;}
+  .nav-toggle{display:none; background:none; border:none; width:32px; height:22px; position:relative;}
+  .nav-toggle span{position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;}
+  .nav-toggle span:nth-child(1){top:0;} .nav-toggle span:nth-child(2){top:10px;} .nav-toggle span:nth-child(3){top:20px;}
+  .mobile-menu{display:none;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 22px; font-size:14.5px; font-weight:500;
+    border-radius:var(--radius); border:1px solid transparent;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+    background:none;
+  }
+  .btn-primary{background:var(--blue); color:#fff;}
+  .btn-primary:hover{background:#1d4fd1;}
+  .btn-primary:disabled{opacity:.55; cursor:not-allowed;}
+  .btn-ghost{border-color:var(--line-on-navy); color:var(--paper);}
+  .btn-ghost:hover{border-color:rgba(248,250,252,.4);}
+  .btn-quiet{border-color:var(--line); color:var(--muted);}
+  .btn-quiet:hover{border-color:var(--muted); color:var(--ink);}
+  .btn-block{width:100%;}
+
+  /* ============ Page shell ============ */
+  .waitlist-main{padding:72px 0 110px;}
+  .waitlist-grid{
+    display:grid; grid-template-columns:.85fr 1.15fr; gap:72px; align-items:start;
+  }
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13.5px; color:var(--muted); margin-bottom:40px;
+  }
+  .back-link:hover{color:var(--ink);}
+
+  /* ============ Intro column ============ */
+  .waitlist-intro h1{
+    font-size:clamp(2rem, 3.2vw, 2.6rem);
+    line-height:1.16;
+    font-weight:600;
+    max-width:12ch;
+  }
+  .waitlist-intro .intro-lede{
+    margin-top:18px; color:var(--muted); font-size:1.05rem; max-width:42ch;
+  }
+  .waitlist-promises{margin-top:48px;}
+  .promise-row{
+    display:grid; grid-template-columns:110px 1fr;
+    gap:18px; padding:22px 0; border-top:1px solid var(--line);
+  }
+  .waitlist-promises .promise-row:last-child{border-bottom:1px solid var(--line);}
+  .promise-tag{font-family:'Poppins',sans-serif; font-size:13px; color:var(--blue); font-weight:600; padding-top:1px;}
+  .promise-row p{color:var(--muted); font-size:14.5px; max-width:34ch;}
+  .privacy-note{
+    margin-top:32px; font-size:13px; color:var(--muted);
+    padding-left:14px; border-left:2px solid var(--line);
+  }
+
+  /* ============ Form card ============ */
+  .form-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:44px 44px 40px;
+    position:relative;
+  }
+  .form-intro{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .form-kicker{font-size:13px; color:var(--muted);}
+  .form-time{font-size:13px; color:var(--muted);}
+
+  .progress-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'Poppins',sans-serif; font-size:13px; font-weight:500; color:var(--ink);
+    margin-bottom:10px;
+  }
+  .progress-label span:last-child{color:var(--muted); font-family:'Inter',sans-serif;}
+  .progress-track{height:2px; background:var(--line); position:relative;}
+  .progress-fill{
+    position:absolute; left:0; top:0; height:100%; background:var(--blue);
+    width:20%; transition:width .35s ease;
+  }
+
+  form{margin-top:34px;}
+  .form-step{display:none;}
+  .form-step.is-active{
+    display:block;
+    animation:step-in .28s ease;
+  }
+  @keyframes step-in{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .form-step h2{font-size:1.35rem; font-weight:600;}
+  .step-subtitle{margin-top:8px; color:var(--muted); font-size:14.5px;}
+  .step-subtitle span{color:var(--muted); opacity:.75;}
+
+  .form-field{margin-top:22px;}
+  .form-field label{
+    display:block; font-size:13.5px; font-weight:500; color:var(--ink); margin-bottom:8px;
+  }
+  .form-field input, .form-field textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);
+    padding:13px 14px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--paper); transition:border-color .15s ease;
+  }
+  .form-field input:focus, .form-field textarea:focus{border-color:var(--blue); outline:none;}
+  .form-field textarea{min-height:110px; resize:vertical;}
+  .form-field.has-error input, .form-field.has-error textarea{border-color:var(--error);}
+  .field-error{
+    display:none; margin-top:6px; font-size:12.5px; color:var(--error);
+  }
+  .form-field.has-error .field-error{display:block;}
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap;
+  }
+
+  .field-group-label{
+    display:block; font-size:13.5px; font-weight:500; color:var(--ink);
+    margin:26px 0 12px;
+  }
+  .form-field:first-child, .field-group-label:first-child{margin-top:0;}
+
+  .option-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;
+  }
+  .option-grid-small{grid-template-columns:repeat(4, 1fr);}
+  .option-card{
+    padding:13px 14px; font-size:14px; color:var(--ink); text-align:left;
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--paper);
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .option-card:hover{border-color:var(--muted);}
+  .option-card.is-selected{
+    border-color:var(--navy); background:var(--navy); color:#fff;
+  }
+
+  .step-actions{
+    display:flex; justify-content:space-between; align-items:center; margin-top:36px;
+  }
+  .step-actions.single{justify-content:flex-end;}
+
+  .spinner{
+    display:none; width:15px; height:15px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.4); border-top-color:#fff;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  button[data-action="submit"].is-loading .spinner{display:inline-block;}
+  button[data-action="submit"].is-loading .btn-label{opacity:.85;}
+
+  .form-message{
+    margin-top:18px; font-size:13.5px; padding:12px 14px; border-radius:var(--radius);
+    display:none;
+  }
+  .form-message.is-visible{display:block;}
+  .form-message.is-error{background:rgba(180,35,24,.08); color:var(--error);}
+  .form-message.is-info{background:rgba(37,99,235,.08); color:var(--blue);}
+
+  .submit-note{margin-top:18px; font-size:12.5px; color:var(--muted);}
+
+  /* ============ Footer ============ */
+  .site-footer{background:var(--navy-deep); color:rgba(248,250,252,.55); padding:44px 0;}
+  .footer-inner{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;}
+  .footer-inner .brand{color:#fff;}
+  .footer-links{display:flex; gap:22px; font-size:13.5px;}
+  .footer-links a:hover{color:#fff;}
+  .site-footer small{font-size:12.5px; display:block; margin-top:6px; color:rgba(248,250,252,.4);}
+
+  /* ============ Responsive ============ */
+  @media (max-width: 980px){
+    .waitlist-grid{grid-template-columns:1fr; gap:48px;}
+    .waitlist-intro{max-width:56ch;}
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    .waitlist-main{padding:48px 0 76px;}
+    .form-card{padding:30px 22px 28px;}
+    .option-grid{grid-template-columns:1fr;}
+    .option-grid-small{grid-template-columns:repeat(2, 1fr);}
+    .promise-row{grid-template-columns:1fr; gap:4px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="brand" aria-label="Elio home">
+<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">elio</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="index.html#what-elio-does">What Elio handles</a>
+        <a href="index.html#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-ghost">Back to home</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" style="background:var(--navy); padding:0 32px 24px; flex-direction:column; gap:16px; display:none;">
+      <a href="index.html#how-it-works" style="color:rgba(248,250,252,.8); padding:8px 0;">How it works</a>
+      <a href="index.html#what-elio-does" style="color:rgba(248,250,252,.8); padding:8px 0;">What Elio handles</a>
+      <a href="index.html#faq" style="color:rgba(248,250,252,.8); padding:8px 0;">FAQ</a>
+      <a href="index.html" class="btn btn-ghost btn-block">Back to home</a>
+    </nav>
+  </header>
+
+  <main class="waitlist-main">
+    <div class="container waitlist-grid">
+
+      <aside class="waitlist-intro">
+        <a class="back-link" href="index.html">← Back to Elio</a>
+        <h1>Help build the back-office you've always wanted.</h1>
+        <p class="intro-lede">Tell us what steals your time. We'll use it to shape Elio around real businesses, real workflows, and the work that never makes it onto the to-do list.</p>
+
+        <div class="waitlist-promises">
+          <div class="promise-row">
+            <div class="promise-tag">Early access</div>
+            <p>Be first to try what we build, before it's open to everyone else.</p>
+          </div>
+          <div class="promise-row">
+            <div class="promise-tag">A real voice</div>
+            <p>Your answers help us decide what Elio learns to handle first.</p>
+          </div>
+          <div class="promise-row">
+            <div class="promise-tag">No noise</div>
+            <p>Only useful updates, sent when there's something worth saying.</p>
+          </div>
+        </div>
+
+        <p class="privacy-note">Your answers stay private and are used only to shape what we build — never sold or shared.</p>
+      </aside>
+
+      <section class="form-card">
+        <div class="form-intro">
+          <span class="form-kicker">Founding group</span>
+          <span class="form-time">Takes about 2 minutes</span>
+        </div>
+
+        <div class="progress-label">
+          <span id="progress-label">Step 1 of 5</span>
+          <span id="progress-percent">20%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <form id="waitlist-form" novalidate>
+
+          <div class="form-step is-active" data-step="1">
+            <h2>First, a little about you.</h2>
+            <p class="step-subtitle">So we know who we're building for.</p>
+            <div class="form-field">
+              <label for="full-name">Your name</label>
+              <input type="text" id="full-name" name="fullName" placeholder="Alex Morgan" required />
+              <span class="field-error">Please enter your full name.</span>
+            </div>
+            <div class="form-field">
+              <label for="email">Best email</label>
+              <input type="email" id="email" name="email" placeholder="alex@yourbusiness.com" required />
+              <span class="field-error">Please enter a valid email address.</span>
+            </div>
+            <div class="form-field">
+              <label for="business-name">Business name</label>
+              <input type="text" id="business-name" name="businessName" placeholder="Your business" required />
+              <span class="field-error">Please enter your business name.</span>
+            </div>
+            <div class="step-actions single">
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <h2>Tell us about your business.</h2>
+            <p class="step-subtitle">There's no wrong answer.</p>
+            <span class="field-group-label">What kind of business do you run?</span>
+            <div class="option-grid" data-field="businessType">
+              <button type="button" class="option-card" data-value="Agency">Agency</button>
+              <button type="button" class="option-card" data-value="Consulting">Consulting</button>
+              <button type="button" class="option-card" data-value="Freelance">Freelance</button>
+              <button type="button" class="option-card" data-value="Retail">Retail</button>
+              <button type="button" class="option-card" data-value="Service Business">Service business</button>
+              <button type="button" class="option-card" data-value="Other">Other</button>
+            </div>
+            <span class="field-group-label">How big is your team?</span>
+            <div class="option-grid option-grid-small" data-field="businessSize">
+              <button type="button" class="option-card" data-value="Just me">Just me</button>
+              <button type="button" class="option-card" data-value="2-5">2–5</button>
+              <button type="button" class="option-card" data-value="6-20">6–20</button>
+              <button type="button" class="option-card" data-value="21+">21+</button>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <h2>Where does your time go?</h2>
+            <p class="step-subtitle">Choose everything that sounds familiar.</p>
+            <div class="option-grid" data-field="biggestChallenges" data-multi="true">
+              <button type="button" class="option-card" data-value="Chasing Payments">Chasing payments</button>
+              <button type="button" class="option-card" data-value="Customer Follow-Ups">Customer follow-ups</button>
+              <button type="button" class="option-card" data-value="Scheduling">Scheduling</button>
+              <button type="button" class="option-card" data-value="Managing Invoices">Managing invoices</button>
+              <button type="button" class="option-card" data-value="Managing Emails">Managing email</button>
+              <button type="button" class="option-card" data-value="General Admin">General admin</button>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="4">
+            <h2>What's already in your toolkit?</h2>
+            <p class="step-subtitle">Select all that apply — this helps us prioritize integrations.</p>
+            <div class="option-grid" data-field="currentTools" data-multi="true">
+              <button type="button" class="option-card" data-value="Gmail">Gmail</button>
+              <button type="button" class="option-card" data-value="Outlook">Outlook</button>
+              <button type="button" class="option-card" data-value="WhatsApp">WhatsApp</button>
+              <button type="button" class="option-card" data-value="Google Calendar">Google Calendar</button>
+              <button type="button" class="option-card" data-value="Stripe">Stripe</button>
+              <button type="button" class="option-card" data-value="Paystack">Paystack</button>
+              <button type="button" class="option-card" data-value="QuickBooks">QuickBooks</button>
+              <button type="button" class="option-card" data-value="Excel">Excel</button>
+              <button type="button" class="option-card" data-value="Other">Something else</button>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">One last thing</button>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="5">
+            <h2>If Elio could solve one problem…</h2>
+            <p class="step-subtitle">What would you want it to handle first? <span>(Optional)</span></p>
+            <div class="form-field">
+              <label for="primary-problem" class="visually-hidden">Your answer</label>
+              <textarea id="primary-problem" name="primaryProblem" placeholder="I spend too much time…"></textarea>
+            </div>
+            <div id="form-message" class="form-message"></div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="submit" class="btn btn-primary" data-action="submit">
+                <span class="spinner" aria-hidden="true"></span>
+                <span class="btn-label">Join the founding group</span>
+              </button>
+            </div>
+            <p class="submit-note">By joining, you agree to receive occasional Elio updates.</p>
+          </div>
+
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a href="index.html" class="brand"><span class="brand-mark">e</span><span class="brand-word">elio</span></a>
+        <small>Less busywork. More business. © 2026 Elio.</small>
+      </div>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Keep this page functional when only waitlist.html is uploaded.
+    // This is the public anon key, never a service_role key.
+    window.__ELIO_SUPABASE_CONFIG = {
+      url: 'https://rdwiokoapwzybgndwodg.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkd2lva29hcHd6eWJnbmR3b2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2OTA4MzAsImV4cCI6MjEwNDI2NjgzMH0.WfG6oxN5Q7FotzWhgETenrDeANpKnjUTw4MrRYgVVfA'
+    };
+  </script>
+  <script src="supabase.js"></script>
+  <script>
+    // Fallback for hosts that deploy only this HTML file and omit sibling assets.
+    if (!window.getElioClient && window.supabase && window.__ELIO_SUPABASE_CONFIG) {
+      window.getElioClient = function () {
+        if (!window.__elioSupabaseClient) {
+          window.__elioSupabaseClient = window.supabase.createClient(
+            window.__ELIO_SUPABASE_CONFIG.url,
+            window.__ELIO_SUPABASE_CONFIG.anonKey,
+            { auth: { persistSession: false, autoRefreshToken: false } }
+          );
+        }
+        return window.__elioSupabaseClient;
+      };
+    }
+  </script>
+  <script src="referral.js"></script>
+  <script>
+    // ---- Mobile nav toggle (matches index.html) ----
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.style.display === 'flex';
+      mobileMenu.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    // ---- Waitlist multi-step form ----
+    (function () {
+      const form = document.getElementById('waitlist-form');
+      const steps = Array.from(form.querySelectorAll('.form-step'));
+      const totalSteps = steps.length;
+      const progressFill = document.getElementById('progress-fill');
+      const progressLabel = document.getElementById('progress-label');
+      const progressPercent = document.getElementById('progress-percent');
+      const formMessage = document.getElementById('form-message');
+
+      let currentStep = 1;
+      const answers = {
+        fullName: '', email: '', businessName: '',
+        businessType: '', businessSize: '',
+        biggestChallenges: [], currentTools: [],
+        primaryProblem: ''
+      };
+
+      function showStep(stepNumber) {
+        steps.forEach(step => {
+          step.classList.toggle('is-active', Number(step.dataset.step) === stepNumber);
+        });
+        const pct = Math.round((stepNumber / totalSteps) * 100);
+        progressFill.style.width = pct + '%';
+        progressLabel.textContent = `Step ${stepNumber} of ${totalSteps}`;
+        progressPercent.textContent = pct + '%';
+        currentStep = stepNumber;
+      }
+
+      function setFieldError(field, hasError) {
+        field.classList.toggle('has-error', hasError);
+      }
+
+      function validateStep1() {
+        let valid = true;
+        const nameField = document.getElementById('full-name').closest('.form-field');
+        const emailField = document.getElementById('email').closest('.form-field');
+        const bizField = document.getElementById('business-name').closest('.form-field');
+
+        const nameOk = document.getElementById('full-name').value.trim().length > 1;
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value.trim());
+        const bizOk = document.getElementById('business-name').value.trim().length > 1;
+
+        setFieldError(nameField, !nameOk);
+        setFieldError(emailField, !emailOk);
+        setFieldError(bizField, !bizOk);
+
+        if (nameOk) answers.fullName = document.getElementById('full-name').value.trim();
+        if (emailOk) answers.email = document.getElementById('email').value.trim();
+        if (bizOk) answers.businessName = document.getElementById('business-name').value.trim();
+
+        valid = nameOk && emailOk && bizOk;
+        return valid;
+      }
+
+      // Option card selection (single + multi select)
+      form.querySelectorAll('.option-grid').forEach(grid => {
+        const field = grid.dataset.field;
+        const isMulti = grid.dataset.multi === 'true';
+
+        grid.querySelectorAll('.option-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const value = card.dataset.value;
+            if (isMulti) {
+              const list = answers[field];
+              const idx = list.indexOf(value);
+              if (idx > -1) {
+                list.splice(idx, 1);
+                card.classList.remove('is-selected');
+              } else {
+                list.push(value);
+                card.classList.add('is-selected');
+              }
+            } else {
+              grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('is-selected'));
+              card.classList.add('is-selected');
+              answers[field] = value;
+            }
+          });
+        });
+      });
+
+      // Next / Back navigation
+      form.querySelectorAll('[data-action="next"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (currentStep === 1 && !validateStep1()) return;
+          if (currentStep < totalSteps) showStep(currentStep + 1);
+        });
+      });
+      form.querySelectorAll('[data-action="back"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (currentStep > 1) showStep(currentStep - 1);
+        });
+      });
+
+      function showMessage(text, type) {
+        formMessage.textContent = text;
+        formMessage.className = 'form-message is-visible is-' + type;
+      }
+
+      function generateReferralCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = '';
+        for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        return code;
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        answers.primaryProblem = document.getElementById('primary-problem').value.trim();
+
+        const submitBtn = form.querySelector('[data-action="submit"]');
+        submitBtn.classList.add('is-loading');
+        submitBtn.disabled = true;
+
+        const params = new URLSearchParams(window.location.search);
+        const referredBy = params.get('ref') || null;
+
+        let referralCode = null;
+
+        try {
+          const supabase = window.getElioClient ? window.getElioClient() : null;
+          if (supabase) {
+            const { data, error } = await supabase.rpc('join_waitlist', {
+              p_full_name: answers.fullName,
+              p_email: answers.email,
+              p_business_name: answers.businessName,
+              p_business_type: answers.businessType,
+              p_business_size: answers.businessSize,
+              p_biggest_challenges: answers.biggestChallenges,
+              p_current_tools: answers.currentTools,
+              p_primary_problem: answers.primaryProblem,
+              p_referred_by: referredBy
+            });
+            if (error) throw error;
+            const result = Array.isArray(data) ? data[0] : data;
+            if (!result || !result.referral_code) throw new Error('Incomplete waitlist response.');
+            referralCode = result.referral_code;
+            sessionStorage.setItem('elio_referral_count', String(result.referral_count || 0));
+          } else {
+            // Supabase not configured yet — log locally so the flow can still be tested end-to-end.
+            throw new Error('Waitlist backend is not configured yet.');
+          }
+
+          sessionStorage.setItem('elio_full_name', answers.fullName);
+          sessionStorage.setItem('elio_referral_code', referralCode);
+          window.location.href = 'success.html';
+        } catch (err) {
+          console.error('Waitlist submission failed:', err);
+          if (err && (err.code === '23505' || (err.message && /already on the waitlist|duplicate/i.test(err.message)))) {
+            showMessage("That email is already on the list — check your inbox for your referral link.", 'error');
+          } else if (err && err.message === 'Waitlist backend is not configured yet.') {
+            showMessage("The waitlist connection is not configured yet. Please try again later.", 'error');
+          } else {
+            const safeMessage = err && err.message
+              ? err.message
+              : "Unknown Supabase error.";
+            showMessage("Supabase could not save your signup: " + safeMessage, 'error');
+          }
+          submitBtn.classList.remove('is-loading');
+          submitBtn.disabled = false;
+        }
+      });
+
+      showStep(1);
+    })();
+  </script>
+</body>
+</html>
