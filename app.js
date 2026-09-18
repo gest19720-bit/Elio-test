@@ -9,6 +9,7 @@ import { createFollowUpWorkflow } from '../services/follow-up-service.js';
 import { listCustomers, createCustomer, updateCustomer, deleteCustomer } from '../services/customer-service.js';
 import { listProducts, createProduct, updateProduct, deleteProduct } from '../services/product-service.js';
 import { listMcpConnections, createMcpConnection, revokeMcpConnection, listMcpAccessLog } from '../services/mcp-service.js';
+import { askAssistant } from '../services/assistant-service.js';
 import { renderMcpPage } from './mcp-page.js';
 import { renderMetricsPage } from './metrics-page.js';
 
@@ -129,7 +130,135 @@ async function showMcpLog(connectionId, appName) {
 
 async function renderConnections(b){const providers=[['Gmail','Communication'],['Outlook','Communication'],['WhatsApp','Communication'],['Stripe','Payments'],['Paystack','Payments'],['Google Calendar','Productivity'],['Google Drive','Productivity']];document.querySelector('#app-content').innerHTML=header('Connections','Elio is transparent about what is and is not connected.')+`<div class="content-grid">${providers.map(([name,category])=>`<section class="card"><span class="eyebrow">${category}</span><h3 style="margin:8px 0">${name}</h3><p>Connect ${name} when you are ready. The integration is not available in this MVP.</p><span class="badge" style="margin-top:18px">Coming soon</span></section>`).join('')}</div>`;}
 
-async function renderAssistant(b){const brief=await buildDailyBrief(b.id);document.querySelector('#app-content').innerHTML=header('Ask Elio','A calm place to understand what is happening.')+`<section class="card" style="max-width:780px"><div class="brief-card" style="margin:-22px -22px 22px;border-radius:var(--radius-lg) var(--radius-lg) 0 0"><div><span class="eyebrow" style="color:var(--elio-amber)">Elio assistant</span><h2>What would be useful to know?</h2><p>Ask about your tasks, follow-ups, or recent activity.</p></div><div class="mascot">e</div></div><div class="option-grid" style="margin-bottom:20px"><button class="option" data-prompt="What needs my attention today?">What needs my attention today?</button><button class="option" data-prompt="Which customers need follow-ups?">Which customers need follow-ups?</button><button class="option" data-prompt="Summarize my business activity.">Summarize my business activity.</button><button class="option" data-prompt="What did Elio do today?">What did Elio do today?</button></div><form data-assistant-form><div class="field"><label for="assistant-input">Your question</label><textarea id="assistant-input" placeholder="Ask Elio something about your workspace…" required></textarea></div><button class="btn btn-primary">Ask Elio</button></form><div data-answer style="margin-top:22px"></div></section>`;document.querySelectorAll('[data-prompt]').forEach(x=>x.onclick=()=>{document.querySelector('#assistant-input').value=x.dataset.prompt});document.querySelector('[data-assistant-form]').onsubmit=async e=>{e.preventDefault();const q=document.querySelector('#assistant-input').value.toLowerCase(),a=document.querySelector('[data-answer]');if(q.includes('attention')||q.includes('follow'))a.innerHTML=`<div class="card" style="background:var(--elio-blue-light);border:0"><strong>Here’s what I found.</strong><p style="margin-top:8px">${brief.totalAttention?`There ${brief.totalAttention===1?'is':'are'} ${brief.totalAttention} item${brief.totalAttention===1?'':'s'} needing attention: ${brief.approvals.length} approval${brief.approvals.length===1?'':'s'}, ${brief.followUps.length} customer follow-up${brief.followUps.length===1?'':'s'}, and ${brief.overdue.length} overdue task${brief.overdue.length===1?'':'s'}.`:'Nothing needs your attention right now.'}</p></div>`;else a.innerHTML='<div class="card" style="background:var(--surface-secondary)"><strong>I can help you understand your workspace.</strong><p style="margin-top:8px">Try asking about attention, follow-ups, tasks, or activity. Safe actions will always ask for your approval.</p></div>';};}
+/* ====================================================================
+   ASK ELIO — AI assistant page
+   A calm conversation surface: dark hero, quick prompts, a composer,
+   and grounded answers from services/assistant-service.js.
+   ==================================================================== */
+
+const assistantPrompts = [
+  ['What needs my attention today?', '◎', 'Priorities'],
+  ['Which customers need follow-ups?', '♧', 'Customers'],
+  ['Summarize my business activity.', '↗', 'Activity'],
+  ['Which tasks are overdue?', '✓', 'Tasks']
+];
+
+let assistantHistory = []; // {question, answer, next_steps, sources, mode, time}
+
+function assistantBubble(item, index) {
+  return `<article class="assistant-turn" role="group" aria-label="Elio's answer ${index + 1}">
+    <div class="assistant-turn-head">
+      <span class="assistant-turn-mark" aria-hidden="true">e</span>
+      <div class="assistant-turn-meta">
+        <strong>Elio</strong>
+        <small class="muted">${esc(item.time)} · ${item.mode === 'real' ? 'AI grounded in your workspace' : 'Workspace summary'}</small>
+      </div>
+      <button class="btn btn-quiet assistant-copy" data-copy-answer="${index}" type="button" aria-label="Copy this answer">⧉ Copy</button>
+    </div>
+    <p class="assistant-answer-text">${esc(item.answer)}</p>
+    ${item.next_steps?.length ? `<div class="assistant-next"><strong>What to do next</strong><ul>${item.next_steps.slice(0,4).map(step=>`<li>${esc(step)}</li>`).join('')}</ul></div>` : ''}
+    ${item.sources?.length ? `<div class="assistant-sources"><small class="muted">Grounded in</small>${item.sources.map(s=>`<span class="badge">${esc(s)}</span>`).join('')}</div>` : ''}
+  </article>`;
+}
+
+async function renderAssistant(b){
+  const brief=await buildDailyBrief(b.id);
+  assistantHistory=[];
+  document.querySelector('#app-content').innerHTML=header('Ask Elio','A calm place to understand what is happening behind your business.')+`
+  <div class="assistant-layout">
+    <section class="stack">
+      <section class="card brief-card assistant-hero">
+        <div>
+          <span class="eyebrow" style="color:var(--elio-amber)">Quiet intelligence</span>
+          <h2>What would be useful to know?</h2>
+          <p>Elio reads your workspace and explains the next useful step. It will not change or send anything without your approval.</p>
+        </div>
+        <div class="mascot">e</div>
+      </section>
+      <div class="assistant-quick">
+        <span class="eyebrow">Try asking</span>
+        <div class="assistant-chips">
+          ${assistantPrompts.map(([q,icon,label])=>`<button class="assistant-chip" data-prompt="${esc(q)}" type="button"><span class="assistant-chip-icon" aria-hidden="true">${icon}</span><span class="assistant-chip-text">${esc(q)}</span><span class="assistant-chip-tag">${label}</span></button>`).join('')}
+        </div>
+      </div>
+      <section class="card assistant-conversation" aria-live="polite">
+        <div data-answer>
+          <div class="assistant-empty">
+            <div class="mascot">e</div>
+            <h3>Elio is ready.</h3>
+            <p>Choose a prompt above or ask your own question. Answers are grounded in your live workspace data.</p>
+          </div>
+        </div>
+      </section>
+      <form data-assistant-form class="assistant-composer" aria-label="Ask Elio a question">
+        <label class="sr-only" for="assistant-input">Your question for Elio</label>
+        <textarea id="assistant-input" maxlength="1200" rows="1" placeholder="Ask Elio about your customers, tasks, approvals, or activity…" required></textarea>
+        <div class="assistant-composer-foot">
+          <small class="muted" data-question-count>0 / 1200</small>
+          <span class="assistant-privacy"><span aria-hidden="true">🔒</span> Nothing is sent or changed without your approval.</span>
+          <button class="btn btn-primary" type="submit">Ask Elio <span aria-hidden="true">↗</span></button>
+        </div>
+      </form>
+    </section>
+    <aside class="stack assistant-aside">
+      <section class="card"><div class="section-title"><div><h3>What Elio sees</h3><p>Live workspace snapshot.</p></div><span class="badge blue">Live</span></div>
+        <div class="assistant-facts">
+          <div><strong>${brief.approvals.length}</strong><span>Pending approvals</span></div>
+          <div><strong>${brief.followUps.length}</strong><span>Customer follow-ups</span></div>
+          <div><strong>${brief.overdue.length}</strong><span>Overdue tasks</span></div>
+        </div>
+        <a class="btn btn-secondary" href="approvals.html" style="width:100%;margin-top:16px">Review approvals</a>
+      </section>
+      <section class="card"><div class="section-title"><h3>How Elio works</h3></div>
+        <div class="list">
+          <div class="list-item"><span class="avatar">1</span><div><strong>Observe</strong><p>Reads your current workspace data.</p></div></div>
+          <div class="list-item"><span class="avatar">2</span><div><strong>Understand</strong><p>Connects status, dates, and activity.</p></div></div>
+          <div class="list-item"><span class="avatar">3</span><div><strong>Recommend</strong><p>Suggests a next step for you to approve.</p></div></div>
+        </div>
+      </section>
+    </aside>
+  </div>`;
+  // --- behavior wiring ---
+  const form=document.querySelector('[data-assistant-form]');
+  const input=document.querySelector('#assistant-input');
+  const count=document.querySelector('[data-question-count]');
+  const answer=document.querySelector('[data-answer]');
+  const submit=form.querySelector('button[type=submit]');
+  const draw=()=>{answer.innerHTML=assistantHistory.length?assistantHistory.map(assistantBubble).join(''):emptyState('Elio is ready.','Choose a prompt or ask your own question.');};
+  const setQ=v=>{input.value=v;count.textContent=`${input.value.length} / 1200`;input.focus();};
+  document.querySelectorAll('[data-prompt]').forEach(btn=>btn.onclick=()=>setQ(btn.dataset.prompt));
+  input.oninput=()=>{count.textContent=`${input.value.length} / 1200`;input.style.height='auto';input.style.height=Math.min(input.scrollHeight,180)+'px';};
+  input.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}};
+  answer.addEventListener('click',async e=>{
+    const btn=e.target.closest('[data-copy-answer]');
+    if(!btn)return;
+    const item=assistantHistory[Number(btn.dataset.copyAnswer)];
+    if(!item)return;
+    try{await navigator.clipboard.writeText(item.answer);toast('Answer copied.');}
+    catch{toast('Copy is not available here.');}
+  });
+  form.onsubmit=async e=>{
+    e.preventDefault();
+    const question=input.value.trim();
+    if(!question)return;
+    submit.disabled=true;
+    answer.insertAdjacentHTML('beforeend','<div class="assistant-thinking" data-thinking><span class="mascot">e</span><div><strong>Elio is checking your workspace…</strong><p>Connecting the relevant details.</p></div></div>');
+    answer.querySelector('[data-thinking]')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    try{
+      const snapshot={tasks:[],approvals:[],customers:[],activities:[],overdue:[],followUps:brief.followUps};
+      const result=await askAssistant({question,snapshot});
+      assistantHistory.push({question,answer:result.answer,next_steps:result.next_steps||[],sources:result.sources||[],mode:result.mode,time:new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit'}).format(new Date())});
+      draw();
+      answer.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }catch(error){
+      assistantHistory.push({question,answer:friendlyError(error,'Elio could not answer yet. Try again in a moment.'),next_steps:[],sources:[],mode:'local',time:'now'});
+      draw();
+    }finally{
+      submit.disabled=false;
+      input.focus();
+    }
+  };
+}
 
 async function renderSettings(b){document.querySelector('#app-content').innerHTML=header('Settings','Shape how Elio fits into your business.')+`<section class="card"><form data-settings><div class="section-title"><div><h3>Business profile</h3><p>These details help Elio make better suggestions.</p></div><button class="btn btn-primary">Save changes</button></div><div class="content-grid"><div><div class="field"><label>Business name</label><input name="name" value="${esc(b.name)}" required></div><div class="field"><label>Industry</label><input name="industry" value="${esc(b.industry)}"></div></div><div><div class="field"><label>Business size</label><select name="size">${['Just me','2–5 people','6–20 people','21–50 people','50+'].map(x=>`<option ${x===b.size?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Communication style</label><select name="communication_style">${['Professional','Friendly','Casual','Formal'].map(x=>`<option ${x===b.communication_style?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Automation level</label><select name="automation_level">${['Manual','Assisted','Automated'].map(x=>`<option ${x===b.automation_level?'selected':''}>${x}</option>`).join('')}</select></div></div></div></form></section>`;document.querySelector('[data-settings]').onsubmit=async e=>{e.preventDefault();const f=e.target;const {error}=await supabase.from('businesses').update({name:f.name.value.trim(),industry:f.industry.value.trim(),size:f.size.value,communication_style:f.communication_style.value,automation_level:f.automation_level.value,updated_at:new Date().toISOString()}).eq('id',b.id);if(error){toast(friendlyError(error));return}await logActivity({businessId:b.id,action:'Updated Elio preferences',entityType:'business',entityId:b.id});toast('Settings saved.');};}
 

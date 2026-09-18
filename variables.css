@@ -1,14 +1,16 @@
 /* =========================================================
-   ELIO — AUTH DESIGN TOKENS
-   "Quiet intelligence": a calmer, editorial counterpart to
-   the brighter marketing site. Used by login.html, signup.html
-   and onboarding.html.
+   ELIO — DESIGN TOKENS
+   A single, deliberate system: warm paper for the auth story,
+   a precise cool workspace for the product. Everything below
+   is consumed by global/layout/components/responsive.
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
 
 :root{
-  /* ---- Paper side (form panel) ---- */
+  /* ---------------------------------------------------------
+     Auth surfaces — “quiet intelligence”
+  --------------------------------------------------------- */
   --paper:        #fbfaf6;
   --paper-dim:    #f2f0e8;
   --ink:          #12181f;
@@ -16,7 +18,6 @@
   --ink-faint:    #97a0a8;
   --line:         #e6e2d5;
 
-  /* ---- Deep side (aside panel) ---- */
   --deep:         #0b0f16;
   --deep-2:       #131a24;
   --deep-3:       #1c2531;
@@ -24,32 +25,85 @@
   --white:        #ffffff;
   --white-dim:    rgba(255,255,255,.68);
 
-  /* ---- Accent ---- */
-  --elio-blue:      #3157e8;
-  --elio-blue-dim:  rgba(49,87,232,.12);
-  --elio-blue-ring: rgba(49,87,232,.22);
-  --elio-amber:     #e7b055;
-  --elio-amber-dim: rgba(231,176,85,.16);
+  /* ---------------------------------------------------------
+     App palette — cool graphite, one confident blue
+  --------------------------------------------------------- */
+  --background:        #f4f5f8;
+  --surface:           #ffffff;
+  --surface-secondary: #eef1f5;
+  --surface-sunken:    #f8fafc;
+  --text-primary:      #14171d;
+  --text-secondary:    #5d6572;
+  --text-tertiary:     #98a0ab;
 
-  --success:  #4bbf8c;
-  --success-dim: rgba(75,191,140,.14);
-  --danger:   #e2604a;
-  --danger-dim: rgba(226,96,74,.1);
+  --border:            #e5e8ee;
+  --border-strong:     #d4d9e2;
+  --elio-ink:          #0d1117;
 
-  /* ---- Type ---- */
+  --elio-blue:         #3157e8;
+  --elio-blue-hover:   #2747c9;
+  --elio-blue-light:   #ecf0fe;
+  --elio-amber:        #e7b055; /* light amber: every inline use sits on dark surfaces */
+  --elio-amber-deep:   #b97f24; /* amber for text on light surfaces */
+  --success:           #2f9e6a;
+  --success-light:     #e7f6ee;
+  --warning:           #b97f24;
+  --warning-light:     #fdf3e2;
+  --danger:            #d24a35;
+  --danger-light:      #fdeeec;
+
+  /* ---------------------------------------------------------
+     Type
+  --------------------------------------------------------- */
   --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   --sans:  'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sans-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  /* ---- Shape ---- */
-  --radius-lg:   28px;
-  --radius-md:   16px;
+  /* ---------------------------------------------------------
+     Shape
+  --------------------------------------------------------- */
+  --radius-xs:   8px;
   --radius-sm:   11px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   26px;
   --radius-pill: 999px;
 
-  /* ---- Depth ---- */
+  /* ---------------------------------------------------------
+     Depth — soft, directional, never heavy
+  --------------------------------------------------------- */
   --shadow-panel: 0 40px 90px rgba(12,17,24,.16);
   --shadow-soft:  0 14px 34px rgba(12,17,24,.08);
-  --shadow-btn:   0 12px 26px rgba(49,87,232,.24);
+  --shadow-btn:   0 10px 22px rgba(49,87,232,.22);
+  --shadow-sm:    0 1px 2px rgba(15,23,42,.05);
+  --shadow-md:    0 10px 30px rgba(15,23,42,.08);
+  --shadow-lg:    0 24px 60px rgba(15,23,42,.16);
 
+  /* ---------------------------------------------------------
+     Motion
+  --------------------------------------------------------- */
   --ease: cubic-bezier(.16,1,.3,1);
+  --ease-snap: cubic-bezier(.34,1.4,.64,1);
+  --speed: .18s;
+
+  /* App aliases (some scripts reference these bare names) */
+  --success-dim: var(--success-light);
+  --danger-dim:  var(--danger-light);
+  --elio-blue-dim: var(--elio-blue-light);
+  --elio-blue-ring: rgba(49,87,232,.22);
+  --elio-amber-dim: var(--warning-light);
+}
+
+/* ---------------------------------------------------------
+   App-scoped aliases — everything from here on inherits the
+   workspace palette while auth pages keep the paper story.
+--------------------------------------------------------- */
+body[data-page]{
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+
+@media (prefers-reduced-motion:reduce){
+  :root{ --speed:0s; }
 }
