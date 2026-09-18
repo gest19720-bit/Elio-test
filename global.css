@@ -1,5 +1,8 @@
 /* =========================================================
-   ELIO — AUTH GLOBAL LAYOUT
+   ELIO — GLOBAL BASE
+   One reset, two voices: the editorial auth pages and the
+   precise workspace. Keep this file structural; components
+   live in components.css.
    ========================================================= */
 
 *{box-sizing:border-box}
@@ -12,21 +15,23 @@ body{
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-body,button,input,textarea{font-size:16px}
+body,button,input,textarea,select{font-size:16px}
 button,a{font:inherit}
 a{color:inherit;text-decoration:none}
 button{border:0;cursor:pointer;background:none;color:inherit}
+img{max-width:100%}
 h1,h2,h3,p{margin:0}
 h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height:1.08}
 ::selection{background:var(--elio-blue-dim);color:var(--elio-blue)}
 
-/* ---------------------------------------------------------
-   Split-screen auth shell
---------------------------------------------------------- */
+/* =========================================================
+   AUTH PAGES — the editorial half
+   ========================================================= */
+
 .auth-page{
   min-height:100vh;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,0.92fr);
+  grid-template-columns:minmax(0,1fr) minmax(0,.92fr);
 }
 
 .auth-panel{
@@ -50,7 +55,6 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height
   box-shadow:0 4px 12px rgba(12,17,24,.14);
 }
 .auth-brand .brand-name{
-  font-family:var(--sans);
   font-weight:800;
   font-size:1.05rem;
   letter-spacing:-.02em;
@@ -69,20 +73,12 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
 .form-card h1,
-.form-card h2{
-  font-size:clamp(1.7rem,3vw,2.15rem);
-  color:var(--ink);
-}
+.form-card h2{font-size:clamp(1.7rem,3vw,2.15rem);color:var(--ink)}
 .form-card p{color:var(--ink-soft);font-size:.96rem;line-height:1.6}
-.form-card small.muted{
-  display:block;
-  margin-top:7px;
-  color:var(--ink-faint);
-  font-size:.76rem;
-}
+.form-card small.muted{display:block;margin-top:7px;color:var(--ink-faint);font-size:.76rem}
 
 /* ---------------------------------------------------------
-   Aside — the one bold, deliberate moment on the page
+   Aside — one bold, deliberate moment per page
 --------------------------------------------------------- */
 .auth-aside{
   position:relative;
@@ -100,8 +96,7 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height
   content:"";
   position:absolute;
   inset:0;
-  background-image:
-    radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+  background-image:radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
   background-size:26px 26px;
   mask-image:radial-gradient(circle at 30% 30%, black, transparent 72%);
   opacity:.5;
@@ -120,16 +115,9 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height
   line-height:1.65;
   max-width:400px;
 }
-.auth-aside h2{
-  color:var(--white)!important;
-  font-weight:400;
-  letter-spacing:-.015em;
-}
+.auth-aside h2{color:var(--white)!important;font-weight:400;letter-spacing:-.015em}
 .auth-aside h2 br{display:block}
 
-/* ---------------------------------------------------------
-   Responsive: collapse to a single column below ~960px
---------------------------------------------------------- */
 @media (max-width:960px){
   .auth-page{grid-template-columns:1fr}
   .auth-aside{display:none}
@@ -139,6 +127,61 @@ h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height
   .auth-panel{padding:96px 22px 48px}
   .auth-brand{top:26px;left:22px}
 }
+
+/* =========================================================
+   AUTHENTICATED APP — precise, calm workspace
+   These tokens were previously declared here; they now alias
+   the root system in variables.css. Keep the selector so
+   boot placeholders and app screens render before JS mounts.
+   ========================================================= */
+
+body[data-page]{
+  margin:0;
+  background:var(--background);
+  color:var(--text-primary);
+  font:15px/1.55 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Boot placeholder before the shell mounts */
+body[data-page]:not(.elio-ready)::before{
+  content:'Elio is getting things ready...';
+  display:block;
+  max-width:760px;
+  margin:12vh auto;
+  padding:32px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  box-shadow:var(--shadow-sm);
+  color:var(--text-secondary);
+  text-align:center;
+}
+
+body[data-page] h1,
+body[data-page] h2,
+body[data-page] h3,
+body[data-page] h4{
+  font-family:var(--sans-display);
+  line-height:1.18;
+  margin:0;
+  letter-spacing:-.02em;
+}
+body[data-page] h1{font-size:30px;letter-spacing:-.035em}
+body[data-page] h2{font-size:21px;letter-spacing:-.025em}
+body[data-page] h3{font-size:16px}
+body[data-page] h4{font-size:14.5px}
+body[data-page] p{margin:0;color:var(--text-secondary)}
+/* NOTE: no body[data-page] a color rule here on purpose — it outranked
+   .nav a / .muted / .section-title a and made sidebar items invisible
+   until hover. The base `a{color:inherit}` above already covers links. */
+body[data-page] button{cursor:pointer}
+body[data-page] button,
+body[data-page] input,
+body[data-page] textarea,
+body[data-page] select{font:inherit}
+body[data-page] :focus-visible{outline:3px solid var(--elio-blue-ring);outline-offset:2px;border-radius:6px}
+body[data-page] small{font-size:12.5px;line-height:1.5}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
