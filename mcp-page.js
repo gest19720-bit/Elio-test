@@ -1,14 +1,14 @@
 import { SUPABASE_URL } from './config.js';
 import { supabase } from './supabase.js';
 import { createMcpConnection, revokeMcpConnection } from '../services/mcp-service.js';
-import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp } from '../services/mcp-admin-service.js';
+import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp, revokeOAuthGrant } from '../services/mcp-admin-service.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Never';
 const toast = message => { const el = document.createElement('div'); el.className = 'toast'; el.textContent = message; document.body.append(el); setTimeout(() => el.remove(), 3200); };
 const errorText = error => String(error?.message || 'The MCP service is not available yet.');
 const initialsOf = name => String(name || 'M').trim().split(/\s+/).map(word => word[0]).slice(0, 2).join('').toUpperCase() || 'M';
-const endpointUrl = () => `${SUPABASE_URL}/functions/v1/mcp-server`;
+const endpointUrl = () => `${window.location.origin}/mcp`;
 
 const tools = [
   ['get_business_profile', 'View business profile', 'READ'], ['get_products', 'View products', 'READ'], ['get_customers', 'View customers', 'READ'],
@@ -78,7 +78,7 @@ export async function renderMcpPage() {
 
 function draw(target, overview) {
   const server = overview.server || {}, capability = overview.capabilities || { tools: tools.map(([name, description, access]) => ({ name, description, access_level: access })), resources: [], prompts: [] };
-  const incoming = overview.connections || [], external = overview.external_connections || [], activity = overview.activity || [], clients = overview.clients || [];
+  const incoming = overview.connections || [], oauthGrants = overview.oauth_grants || [], external = overview.external_connections || [], activity = overview.activity || [], clients = overview.clients || [];
   const live = server.status === 'active';
   const connectedClients = clients.filter(client => client.status === 'connected').length;
   const toolsList = capability.tools || [], resourcesList = capability.resources || [], promptsList = capability.prompts || [];
@@ -170,6 +170,11 @@ function draw(target, overview) {
     <div data-client-list>
       ${incoming.length ? incoming.map(permissionCard).join('') : `<div class="mcp-mini-empty"><strong>No client tokens yet.</strong><p>Create a token for Claude, another AI agent, or an internal business tool.</p></div>`}
     </div>
+  </section>
+
+  <section class="card mcp-clients-card">
+    <div class="section-title"><div><h3>OAuth connections</h3><p>Standards-based MCP clients approved through the Elio sign-in flow.</p></div></div>
+    ${oauthGrants.length ? `<div data-oauth-grants>${oauthGrants.map(grant => `<article class="mcp-permission-card"><div class="section-title"><div><h4>${esc(grant.client_id)}</h4><p class="muted">${esc((grant.scopes || []).join(', '))} · approved ${esc(date(grant.approved_at))}</p></div>${grant.revoked_at ? '<span class="badge red">Revoked</span>' : `<button class="btn btn-danger" data-revoke-oauth="${esc(grant.id)}">Revoke</button>`}</div></article>`).join('')}</div>` : '<div class="mcp-mini-empty"><strong>No OAuth clients yet.</strong><p>Connections created by Claude and other compatible clients will appear here.</p></div>'}
   </section>
 
   <section class="card">
@@ -359,6 +364,12 @@ function bind(target, overview) {
       toast('Client token revoked.');
       await renderMcpPage();
     } catch (error) { toast(errorText(error)); }
+  });
+
+  target.querySelectorAll('[data-revoke-oauth]').forEach(button => button.onclick = async () => {
+    if (!confirm('Revoke this OAuth connection? The client will need approval again.')) return;
+    try { await revokeOAuthGrant(button.dataset.revokeOauth); toast('OAuth connection revoked.'); await renderMcpPage(); }
+    catch (error) { toast(errorText(error)); }
   });
 
   target.querySelectorAll('[data-test-external]').forEach(button => button.onclick = async () => {

@@ -42,6 +42,16 @@ node dev-server.mjs
 
 Open `http://localhost:8000/signup.html`. Do not open ES modules using `file://`.
 
+To exercise MCP OAuth on localhost, the static server must also be able to reach the server-side OAuth storage. In **PowerShell**, set the server-only variables before starting it (never add the service-role key to browser files):
+
+```powershell
+$env:SUPABASE_URL = 'https://your-project.supabase.co'
+$env:SUPABASE_SERVICE_ROLE_KEY = 'your-service-role-key'
+node dev-server.mjs
+```
+
+Then use `http://localhost:8000/mcp`. The local server now routes discovery, registration, authorization, token, consent-detail, and MCP proxy requests through the same handlers used by Vercel. Apply migration 008 first.
+
 ## Supabase setup
 
 1. Create or select the Elio Supabase project.
@@ -73,6 +83,16 @@ After signing in and completing onboarding, run `seed_demo.sql` in Supabase SQL 
 ## Deployment and verification
 
 Upload the complete project while preserving `app`, `css`, `js`, `services`, and `supabase` paths. Deploy the database migration before testing authenticated pages, then deploy the Edge Function and set its secret. Static syntax checks do not prove authentication, persistence, RLS, or AI deployment; test signup, onboarding, CRUD, approval resolution, logout, and follow-up generation against the deployed URL.
+
+## MCP OAuth 2.1 deployment
+
+1. **Supabase Dashboard → SQL Editor:** run `supabase/migrations/008_mcp_oauth_21.sql` after migrations 005–007.
+2. **PowerShell:** deploy the updated MCP functions: `supabase functions deploy mcp-server --no-verify-jwt` and `supabase functions deploy mcp-admin`. `mcp-server` validates its own OAuth bearer token, so the Supabase gateway must not require a Supabase JWT before that validation can run.
+3. **Vercel Project → Environment Variables:** set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for Production and Preview. The service-role key is used only by the serverless OAuth endpoints; never put it in browser code.
+4. **Vercel:** deploy this repository, including `api/` and `vercel.json`. The public MCP URL is `https://your-elio-domain/mcp`; it publishes OAuth protected-resource and authorization-server discovery automatically.
+5. **Supabase Dashboard → Authentication → URL Configuration:** add `https://your-elio-domain/app/oauth-consent.html` and the deployed site URL to redirect URLs.
+
+The OAuth server requires Authorization Code + PKCE S256. It supports HTTPS Client ID Metadata Documents and public Dynamic Client Registration, hashes authorization codes and tokens at rest, rotates refresh tokens, and exposes only `business.read` and explicit `business.write` scope. Revoke OAuth grants from the MCP dashboard.
 
 ## Existing waitlist
 

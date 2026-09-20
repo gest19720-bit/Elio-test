@@ -13,3 +13,4 @@ export const createExternalMcp = payload => invoke('create_external', payload);
 export const testExternalMcp = id => invoke('test_external', { id });
 export const setExternalMcpEnabled = (id, enabled) => invoke('set_external_enabled', { id, enabled });
 export const removeExternalMcp = id => invoke('disconnect_external', { id });
+export const revokeOAuthGrant = id => invoke('revoke_oauth_grant', { grant_id: id });
