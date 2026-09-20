@@ -79,7 +79,7 @@ export async function renderMcpPage() {
 function draw(target, overview) {
   const server = overview.server || {}, capability = overview.capabilities || { tools: tools.map(([name, description, access]) => ({ name, description, access_level: access })), resources: [], prompts: [] };
   const incoming = overview.connections || [], oauthGrants = overview.oauth_grants || [], external = overview.external_connections || [], activity = overview.activity || [], clients = overview.clients || [];
-  const live = server.status === 'active';
+  const live = server.status === 'reachable';
   const connectedClients = clients.filter(client => client.status === 'connected').length;
   const toolsList = capability.tools || [], resourcesList = capability.resources || [], promptsList = capability.prompts || [];
 
@@ -97,7 +97,7 @@ function draw(target, overview) {
         </div>
       </div>
       <div class="mcp-hero-side">
-        <span class="mcp-status-pill"><span class="mcp-status-dot" aria-hidden="true"></span>${live ? 'Live' : 'Not deployed'}</span>
+        <span class="mcp-status-pill"><span class="mcp-status-dot" aria-hidden="true"></span>${live ? 'Reachable' : 'Setup incomplete'}</span>
         <span class="mcp-hero-version">v${esc(server.version || '1.0.0')}</span>
       </div>
     </div>
@@ -107,7 +107,7 @@ function draw(target, overview) {
       <div class="mcp-hero-stat"><strong>${promptsList.length}</strong><span>Prompts</span></div>
       <div class="mcp-hero-stat"><strong>${connectedClients}</strong><span>Connected clients</span></div>
     </div>
-    <p class="mcp-hero-note">Capabilities are read-only by default. Write access requires your explicit authorization per client.</p>
+    <p class="mcp-hero-note">${esc(server.health_message || 'Endpoint health has not been checked.')} Capabilities are read-only by default. Write access requires your explicit authorization per client.</p>
   </section>
 
   <div class="content-grid mcp-grid">

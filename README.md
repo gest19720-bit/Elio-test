@@ -89,11 +89,11 @@ Upload the complete project from the root (all pages, styles, scripts, migration
 
 1. **Supabase Dashboard → SQL Editor:** run `008_mcp_oauth_21.sql` after migrations 005–007. In this flattened checkout, numbered SQL migrations are in the project root.
 2. **PowerShell:** deploy the updated MCP functions: `supabase functions deploy mcp-server --no-verify-jwt` and `supabase functions deploy mcp-admin`. `mcp-server` validates its own OAuth bearer token, so the Supabase gateway must not require a Supabase JWT before that validation can run.
-3. **Vercel Project → Environment Variables:** set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for Production and Preview. The service-role key is used only by the serverless OAuth endpoints; never put it in browser code.
+3. **Vercel Project → Environment Variables:** set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `MCP_PUBLIC_ORIGIN=https://your-elio-domain` for Production and Preview. The service-role key is used only by the serverless OAuth endpoints; never put it in browser code.
 4. **Vercel:** deploy this repository, including the root OAuth handlers, `mcp-api.js`, and `vercel.json`. The Vercel configuration explicitly includes flat static files with `@vercel/static` and builds only OAuth/MCP handlers with `@vercel/node`; no API folder is required. The public MCP URL is `https://your-elio-domain/mcp`.
 5. **Supabase Dashboard → Authentication → URL Configuration:** add `https://your-elio-domain/oauth-consent.html` and the deployed site URL to redirect URLs.
 
-The OAuth server requires Authorization Code + PKCE S256. It supports HTTPS Client ID Metadata Documents and public Dynamic Client Registration, hashes authorization codes and tokens at rest, rotates refresh tokens, and exposes only `business.read` and explicit `business.write` scope. Revoke OAuth grants from the MCP dashboard.
+The OAuth server requires Authorization Code + PKCE S256. It supports HTTPS Client ID Metadata Documents and public Dynamic Client Registration, hashes authorization codes and tokens at rest, rotates refresh tokens, and exposes only `business.read` and explicit `business.write` scope. Set `MCP_PUBLIC_ORIGIN` as a Supabase Edge Function secret too, and set `MCP_ENCRYPTION_KEY` (at least 32 characters) if you use the external-MCP credential store. Revoke OAuth grants from the MCP dashboard.
 
 ## Existing waitlist
 

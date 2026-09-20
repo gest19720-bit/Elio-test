@@ -22,19 +22,28 @@ function rpc(id: unknown, result: unknown) { return { jsonrpc: '2.0', id, result
 function rpcError(id: unknown, code: number, message: string, data?: unknown) { return { jsonrpc: '2.0', id, error: { code, message, ...(data ? { data } : {}) } }; }
 function clean(value: unknown, max = 200) { return String(value || '').trim().slice(0, max); }
 async function hashToken(token: string) { const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)); return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join(''); }
+function publicMcpOrigin() { return String(Deno.env.get('MCP_PUBLIC_ORIGIN') || '').replace(/\/$/, ''); }
+function oauthChallenge() {
+  const origin = publicMcpOrigin();
+  return origin ? { 'WWW-Authenticate': `Bearer resource_metadata="${origin}/.well-known/oauth-protected-resource"` } : {};
+}
+function authenticationFailed(message: string, code = 'AUTHENTICATION_FAILED') {
+  return json({ error: { code, message } }, 401, oauthChallenge());
+}
 
 Deno.serve(async request => {
   if (request.method !== 'POST') return json({ error: { code: 'METHOD_NOT_ALLOWED', message: 'Use POST for MCP JSON-RPC requests.' } }, 405);
   const authorization = request.headers.get('Authorization') || '';
   const token = authorization.replace(/^Bearer\s+/i, '').trim();
-  if (!token) return json({ error: { code: 'AUTHENTICATION_REQUIRED', message: 'An MCP client token is required.' } }, 401);
+  if (!token) return authenticationFailed('Authorization is required.', 'AUTHENTICATION_REQUIRED');
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
   const tokenHash = await hashToken(token);
   let { data: connection } = await admin.from('mcp_connections').select('id,user_id,app_name,revoked_at,expires_at,request_count,scopes').eq('token_hash', tokenHash).maybeSingle();
   const { data: oauthToken } = connection ? { data: null } : await admin.from('mcp_oauth_access_tokens').select('id,user_id,client_id,grant_id,scopes,revoked_at,expires_at').eq('token_hash', tokenHash).maybeSingle();
-  if ((!connection && !oauthToken) || connection?.revoked_at || oauthToken?.revoked_at || (connection?.expires_at && new Date(connection.expires_at) <= new Date()) || (oauthToken?.expires_at && new Date(oauthToken.expires_at) <= new Date())) return json({ error: { code: 'AUTHENTICATION_FAILED', message: 'This MCP client is invalid, expired, or revoked.' } }, 401);
-  if (oauthToken?.grant_id) { const { data: grant } = await admin.from('mcp_oauth_grants').select('revoked_at').eq('id', oauthToken.grant_id).maybeSingle(); if (!grant || grant.revoked_at) return json({ error: { code: 'AUTHENTICATION_FAILED', message: 'This MCP authorization grant was revoked.' } }, 401); }
-  const { data: business } = await admin.from('businesses').select('id,name,industry,size,communication_style,automation_level,help_areas').eq('owner_id', connection.user_id).maybeSingle();
+  if ((!connection && !oauthToken) || connection?.revoked_at || oauthToken?.revoked_at || (connection?.expires_at && new Date(connection.expires_at) <= new Date()) || (oauthToken?.expires_at && new Date(oauthToken.expires_at) <= new Date())) return authenticationFailed('This MCP client is invalid, expired, or revoked.');
+  if (oauthToken?.grant_id) { const { data: grant } = await admin.from('mcp_oauth_grants').select('revoked_at').eq('id', oauthToken.grant_id).maybeSingle(); if (!grant || grant.revoked_at) return authenticationFailed('This MCP authorization grant was revoked.'); }
+  const ownerId = connection?.user_id || oauthToken?.user_id;
+  const { data: business } = await admin.from('businesses').select('id,name,industry,size,communication_style,automation_level,help_areas').eq('owner_id', ownerId).maybeSingle();
   if (!business) return json({ error: { code: 'BUSINESS_NOT_FOUND', message: 'The Elio business account is not configured.' } }, 403);
   let body: any; try { body = await request.json(); } catch { return json(rpcError(null, -32700, 'Invalid JSON.')); }
   const id = body?.id ?? null, method = body?.method, params = body?.params || {};
@@ -52,5 +61,14 @@ Deno.serve(async request => {
   return json(rpcError(id, -32601, 'MCP method not supported.'));
 });
 
-async function allowed(connection: any, capability: string, access: string, admin: any) { if (connection.oauth_token_id) return (connection.scopes || []).includes(access === 'WRITE' ? 'business.write' : 'business.read'); const { data } = await admin.from('mcp_permissions').select('enabled,access_level').eq('connection_id', connection.id).eq('capability_name', capability).maybeSingle(); if (data) return data.enabled && ['READ', 'WRITE', 'SENSITIVE'].indexOf(data.access_level) >= ['READ', 'WRITE', 'SENSITIVE'].indexOf(access); return access === 'READ'; }
+async function allowed(connection: any, capability: string, access: string, admin: any) {
+  const scopes = connection.scopes || [];
+  const requiredScope = access === 'WRITE' ? 'business.write' : 'business.read';
+  const scopeAllows = scopes.includes(requiredScope) || (access === 'READ' && scopes.includes('business.write'));
+  if (!scopeAllows) return false;
+  if (connection.oauth_token_id) return true;
+  const { data } = await admin.from('mcp_permissions').select('enabled,access_level').eq('connection_id', connection.id).eq('capability_name', capability).maybeSingle();
+  if (data) return data.enabled && ['READ', 'WRITE', 'SENSITIVE'].indexOf(data.access_level) >= ['READ', 'WRITE', 'SENSITIVE'].indexOf(access);
+  return access === 'READ';
+}
 async function callTool(name: string, input: any, admin: any, business: any, connection: any, audit: any, requiredAccess?: string): Promise<any> { const tool = tools.find(item => item.name === name)!; if (!(await allowed(connection, name, requiredAccess || tool.access, admin))) throw new Error('PERMISSION_DENIED: This capability is not authorized for the MCP client.'); const bid = business.id; if (name === 'get_business_profile') return business; if (name === 'get_products') { const { data, error } = await admin.from('products').select('id,name,category,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', bid).order('updated_at', { ascending: false }).limit(100); if (error) throw error; return data || []; } if (name === 'get_customers') { const { data, error } = await admin.from('customers').select('id,name,email,phone,company,lead_source,status,last_contact_at,notes,created_at,updated_at').eq('business_id', bid).order('updated_at', { ascending: false }).limit(Math.min(Number(input.limit) || 50, 100)); if (error) throw error; return data || []; } if (name === 'get_recent_activity') { const { data, error } = await admin.from('activities').select('actor,action,entity_type,entity_id,metadata,created_at').eq('business_id', bid).order('created_at', { ascending: false }).limit(Math.min(Number(input.limit) || 30, 100)); if (error) throw error; return data || []; } if (name === 'get_sales_summary' || name === 'get_inventory_summary' || name === 'get_business_metrics' || name === 'generate_business_report') { const [products, customers, tasks] = await Promise.all([admin.from('products').select('name,category,selling_price,stock,sales').eq('business_id', bid).limit(100), admin.from('customers').select('id,status').eq('business_id', bid).limit(500), admin.from('tasks').select('status,priority,due_date').eq('business_id', bid).limit(500)]); if (products.error || customers.error || tasks.error) throw new Error('Elio could not load business metrics.'); const rows = products.data || []; const summary = { recorded_sales: rows.reduce((sum: number, item: any) => sum + Number(item.sales || 0), 0), recorded_sales_value: rows.reduce((sum: number, item: any) => sum + Number(item.sales || 0) * Number(item.selling_price || 0), 0), units_in_stock: rows.reduce((sum: number, item: any) => sum + Number(item.stock || 0), 0), products: rows.length, customers: (customers.data || []).length, active_tasks: (tasks.data || []).filter((item: any) => item.status !== 'Completed').length, overdue_tasks: (tasks.data || []).filter((item: any) => item.status !== 'Completed' && item.due_date && item.due_date < new Date().toISOString().slice(0, 10)).length }; if (name === 'get_sales_summary') return { recorded_sales: summary.recorded_sales, recorded_sales_value: summary.recorded_sales_value }; if (name === 'get_inventory_summary') return { units_in_stock: summary.units_in_stock, products: rows.map((item: any) => ({ name: item.name, category: item.category, stock: item.stock })) }; return name === 'get_business_metrics' ? summary : { focus: clean(input.focus, 120) || 'business health', generated_at: new Date().toISOString(), summary }; } if (name === 'create_task') { const title = clean(input.title, 180); if (!title) throw new Error('A task title is required.'); const task = { business_id: bid, title, description: clean(input.description, 2000), priority: ['Low', 'Medium', 'High', 'Critical'].includes(input.priority) ? input.priority : 'Medium', due_date: /^\\d{4}-\\d{2}-\\d{2}$/.test(input.due_date || '') ? input.due_date : null, customer_id: clean(input.customer_id, 80) || null, created_by: connection.user_id }; const { data, error } = await admin.from('tasks').insert(task).select('id,title,description,status,priority,due_date,created_at').single(); if (error) throw error; return data; } throw new Error('Tool implementation is not available.'); }
