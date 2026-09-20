@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 export async function logActivity({ businessId, actor = 'User', action, entityType, entityId = null, metadata = {} }) {
   const { error } = await supabase.from('activities').insert({

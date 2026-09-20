@@ -41,11 +41,11 @@ Open `http://localhost:8000/waitlist.html`, complete a test signup, and verify t
 
 ## Elio MVP AI setup
 
-Run `supabase/migrations/002_elio_mvp.sql` in the Supabase Dashboard SQL Editor after the waitlist migration. It creates the business-scoped product tables, RLS policies, activity/approval records, and the per-user AI quota function.
+Run `002_elio_mvp.sql` in the Supabase Dashboard SQL Editor after the waitlist migration. It creates the business-scoped product tables, RLS policies, activity/approval records, and the per-user AI quota function.
 
-Then run `supabase/migrations/003_crm_leads.sql` to enable the Lead status and lead-source field for the CRM.
+Then run `003_crm_leads.sql` to enable the Lead status and lead-source field for the CRM.
 
-Then run `supabase/migrations/004_products.sql` to create the business-scoped product catalog, stock, pricing, sales fields, and RLS policy.
+Then run `004_products.sql` to create the business-scoped product catalog, stock, pricing, sales fields, and RLS policy.
 
 From **PowerShell** at the project root, deploy the secure AI function:
 
@@ -58,9 +58,9 @@ The browser sends only an authenticated customer ID and follow-up context. The E
 
 ## Elio MCP infrastructure
 
-Run `supabase/migrations/006_mcp_infrastructure.sql` in Supabase Dashboard → SQL Editor after `005_mcp_connections.sql`.
+Run `006_mcp_infrastructure.sql` in Supabase Dashboard → SQL Editor after `005_mcp_connections.sql`.
 
 Deploy both Edge Functions with JWT verification disabled for `mcp-server` (it authenticates its own bearer client tokens) and enabled for `mcp-admin` (it requires the signed-in Elio user session). Set `MCP_ENCRYPTION_KEY` as an Edge Function secret before creating external connections. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side; it must never be placed in browser files.
 
-The Elio MCP endpoint is `https://<project-ref>.supabase.co/functions/v1/mcp-server`. The MCP page is `app/mcp.html`. The server exposes business-scoped tools, resources, and prompts; write capabilities are denied unless explicitly enabled in the page. External MCP credentials are encrypted in the `mcp-admin` Edge Function and are not selected by the browser.
+The Elio MCP endpoint is `https://<project-ref>.supabase.co/functions/v1/mcp-server`. The MCP page is `mcp.html`. The server exposes business-scoped tools, resources, and prompts; write capabilities are denied unless explicitly enabled in the page. External MCP credentials are encrypted in the `mcp-admin` Edge Function and are not selected by the browser.
 - Export or review waitlist data through a protected admin process; never expose the table to anonymous reads.

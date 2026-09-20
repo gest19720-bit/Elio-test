@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 import { logActivity } from './activity-service.js';
 
 export async function listTasks(businessId) {

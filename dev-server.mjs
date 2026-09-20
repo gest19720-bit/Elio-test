@@ -6,19 +6,19 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const apiHandlers = {
-  '/oauth/authorize': require('./api/oauth/authorize.js'),
-  '/oauth/token': require('./api/oauth/token.js'),
-  '/oauth/register': require('./api/oauth/register.js'),
-  '/api/oauth/authorize': require('./api/oauth/authorize.js'),
-  '/api/oauth/token': require('./api/oauth/token.js'),
-  '/api/oauth/register': require('./api/oauth/register.js'),
-  '/api/oauth/request-details': require('./api/oauth/request-details.js'),
-  '/api/oauth/authorization-server': require('./api/oauth/authorization-server.js'),
-  '/api/oauth/protected-resource': require('./api/oauth/protected-resource.js'),
-  '/.well-known/oauth-authorization-server': require('./api/oauth/authorization-server.js'),
-  '/.well-known/oauth-protected-resource': require('./api/oauth/protected-resource.js'),
-  '/mcp': require('./api/mcp.js'),
-  '/api/mcp': require('./api/mcp.js')
+  '/oauth/authorize': require('./oauth-authorize.js'),
+  '/oauth/token': require('./oauth-token.js'),
+  '/oauth/register': require('./oauth-register.js'),
+  '/api/oauth/authorize': require('./oauth-authorize.js'),
+  '/api/oauth/token': require('./oauth-token.js'),
+  '/api/oauth/register': require('./oauth-register.js'),
+  '/api/oauth/request-details': require('./oauth-request-details.js'),
+  '/api/oauth/authorization-server': require('./oauth-authorization-server.js'),
+  '/api/oauth/protected-resource': require('./oauth-protected-resource.js'),
+  '/.well-known/oauth-authorization-server': require('./oauth-authorization-server.js'),
+  '/.well-known/oauth-protected-resource': require('./oauth-protected-resource.js'),
+  '/mcp': require('./mcp-api.js'),
+  '/api/mcp': require('./mcp-api.js')
 };
 
 const root = path.dirname(fileURLToPath(import.meta.url));

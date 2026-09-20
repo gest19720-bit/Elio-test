@@ -1,5 +1,5 @@
-import { AI_MODE } from '../js/config.js';
-import { supabase } from '../js/supabase.js';
+import { AI_MODE } from './config.js';
+import { supabase } from './supabase-client.js';
 
 const clean = value => String(value || '').trim();
 

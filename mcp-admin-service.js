@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 async function invoke(action, payload = {}) {
   const { data, error } = await supabase.functions.invoke('mcp-admin', { body: { action, ...payload } });

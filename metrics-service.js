@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 const day = value => new Date(`${value}T00:00:00`);
 const isoDay = value => value.toISOString().slice(0, 10);

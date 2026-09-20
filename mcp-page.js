@@ -1,7 +1,7 @@
 import { SUPABASE_URL } from './config.js';
-import { supabase } from './supabase.js';
-import { createMcpConnection, revokeMcpConnection } from '../services/mcp-service.js';
-import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp, revokeOAuthGrant } from '../services/mcp-admin-service.js';
+import { supabase } from './supabase-client.js';
+import { createMcpConnection, revokeMcpConnection } from './mcp-service.js';
+import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp, revokeOAuthGrant } from './mcp-admin-service.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Never';
@@ -71,7 +71,7 @@ export async function renderMcpPage() {
     }
     draw(target, overview);
   } catch (error) {
-    target.innerHTML = `${pageHeader()}<section class="card"><div class="empty"><div class="mascot">e</div><h3>MCP backend is not connected.</h3><p>${esc(errorText(error))}</p><p class="mcp-help">Deploy <code>supabase/functions/mcp-admin</code> and apply migration <code>006_mcp_infrastructure.sql</code> before using this dashboard.</p></div></section>`;
+    target.innerHTML = `${pageHeader()}<section class="card"><div class="empty"><div class="mascot">e</div><h3>MCP backend is not connected.</h3><p>${esc(errorText(error))}</p><p class="mcp-help">Deploy <code>function-mcp-admin.ts</code> and apply migration <code>006_mcp_infrastructure.sql</code> before using this dashboard.</p></div></section>`;
     bindHeader(target);
   }
 }
