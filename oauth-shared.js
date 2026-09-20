@@ -6,6 +6,12 @@ const AUTHORIZATION_REQUEST_TTL_SECONDS = 10 * 60;
 const AUTHORIZATION_CODE_TTL_SECONDS = 5 * 60;
 
 function origin(req) {
+  const configured = String(process.env.MCP_PUBLIC_ORIGIN || '').replace(/\/$/, '');
+  if (configured) {
+    const url = new URL(configured);
+    if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))) throw oauthError('server_error', 'MCP_PUBLIC_ORIGIN must be an HTTPS public origin.', 500);
+    return url.origin;
+  }
   const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
   if (!host || /[\s/]/.test(host)) throw oauthError('invalid_request', 'A valid host is required.');
   const localHost = host.split(':')[0].replace(/^\[/, '').replace(/\]$/, '')
