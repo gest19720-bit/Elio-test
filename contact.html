@@ -1,84 +1,387 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact — Elio</title>
-  <meta name="description" content="Get in touch with the Elio team." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contact — Elio</title>
+<meta name="description" content="Questions about Elio, your workspace, or your data? Send a message — a human reads every one." />
 <link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
-<link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="responsive.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+  /* =========================================================
+     ELIO — CONTACT
+     Same design language as the landing page and the product.
+     ========================================================= */
+  :root{
+    --paper:        #fbfaf6;
+    --paper-dim:    #f2f0e8;
+    --ink:          #12181f;
+    --ink-soft:     #5c6570;
+    --ink-faint:    #97a0a8;
+    --line:         #e6e2d5;
+
+    --deep:         #0b0f16;
+    --deep-2:       #131a24;
+    --deep-3:       #1c2531;
+    --line-dark:    rgba(255,255,255,.09);
+    --white:        #ffffff;
+    --white-dim:    rgba(255,255,255,.68);
+    --white-faint:  rgba(255,255,255,.42);
+
+    --blue:         #3157e8;
+    --blue-hover:   #2747c9;
+    --blue-light:   #ecf0fe;
+    --amber:        #e7b055;
+    --amber-deep:   #b97f24;
+    --success:      #2f9e6a;
+    --success-light:#e7f6ee;
+    --danger:       #d24a35;
+
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+    --sans-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    --radius-sm:   11px;
+    --radius-md:   14px;
+    --radius-lg:   20px;
+    --radius-xl:   26px;
+    --pill:        999px;
+
+    --shadow-btn:  0 10px 22px rgba(49,87,232,.22);
+    --shadow-md:   0 10px 30px rgba(15,23,42,.08);
+    --shadow-lg:   0 24px 60px rgba(15,23,42,.16);
+    --speed: .18s;
+    --ease: ease;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:var(--sans-display); color:var(--ink); margin:0; letter-spacing:-.015em; line-height:1.15;}
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  .container{max-width:1180px; margin:0 auto; padding:0 32px;}
+  .serif-accent{font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:0;}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+    outline:2px solid var(--blue); outline-offset:3px; border-radius:4px;
+  }
+
+  /* ---- Shared pieces ---- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--blue);
+  }
+  .eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:currentColor;
+    box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  }
+  .eyebrow.on-dark{color:var(--amber);}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:var(--pill);
+    background:var(--paper-dim); color:var(--ink-soft); border:1px solid var(--line);
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    padding:13px 24px; border-radius:var(--pill);
+    font-weight:700; font-size:.94rem; border:1px solid transparent;
+    transition:transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease), background var(--speed) var(--ease), border-color var(--speed) var(--ease), color var(--speed) var(--ease);
+  }
+  .btn-primary{background:var(--blue); color:#fff; box-shadow:var(--shadow-btn);}
+  .btn-primary:hover{background:var(--blue-hover); transform:translateY(-2px); box-shadow:0 16px 32px rgba(49,87,232,.3);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-primary:disabled{opacity:.55; cursor:not-allowed; transform:none;}
+  .text-link{
+    font-size:.92rem; font-weight:600; color:var(--ink-soft);
+    border-bottom:1px solid transparent; padding-bottom:1px;
+    transition:color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+  }
+  .text-link:hover{color:var(--ink); border-color:var(--ink);}
+  .text-link.on-dark{color:var(--white-dim); border-bottom-color:rgba(255,255,255,.25);}
+  .text-link.on-dark:hover{color:#fff; border-color:#fff;}
+
+  .avatar{
+    width:34px; height:34px; border-radius:50%; flex:none;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--deep); color:var(--amber);
+    font-family:var(--sans-display); font-weight:800; font-size:.85rem;
+  }
+  .avatar.ghost{background:var(--paper-dim); color:var(--ink-soft); border:1px solid var(--line);}
+
+  /* ============ Nav ============ */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(11,15,22,.86);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-dark);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:15px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; color:var(--white);}
+  .brand-mark{width:32px; height:32px; border-radius:9px; object-fit:cover;}
+  .brand-word{font-family:var(--sans-display); font-weight:800; font-size:1.1rem; letter-spacing:-.02em;}
+  .nav-links{display:flex; gap:30px;}
+  .nav-links a{color:var(--white-dim); font-size:.88rem; font-weight:500; transition:color var(--speed) var(--ease);}
+  .nav-links a:hover{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:18px;}
+  .nav-actions .btn{padding:10px 19px; font-size:.86rem;}
+  .nav-toggle{display:none; background:none; border:none; width:34px; height:26px; position:relative;}
+  .nav-toggle span{position:absolute; left:4px; right:4px; height:2px; background:#fff; border-radius:2px;}
+  .nav-toggle span:nth-child(1){top:4px;} .nav-toggle span:nth-child(2){top:12px;} .nav-toggle span:nth-child(3){top:20px;}
+  .mobile-menu{
+    display:none; background:var(--deep); border-bottom:1px solid var(--line-dark);
+    padding:6px 32px 24px; flex-direction:column; gap:14px;
+  }
+  .mobile-menu a{color:var(--white-dim); font-weight:500; padding:4px 0;}
+  .mobile-menu .btn{margin-top:8px;}
+
+  /* ============ Page head ============ */
+  .page-head{
+    background:
+      radial-gradient(760px 420px at 85% -20%, rgba(49,87,232,.2), transparent 62%),
+      var(--deep);
+    color:var(--white); padding:76px 0 72px;
+  }
+  .page-head h1{color:var(--white); font-size:clamp(2.1rem, 3.6vw, 3rem); letter-spacing:-.03em; margin-top:16px; max-width:16ch;}
+  .page-head h1 .serif-accent{color:var(--amber);}
+  .page-head .lede{margin-top:16px; color:var(--white-dim); font-size:1.05rem; max-width:52ch;}
+
+  /* ============ Contact layout ============ */
+  .contact-main{padding:76px 0 104px;}
+  .contact-grid{display:grid; grid-template-columns:.9fr 1.1fr; gap:56px; align-items:start;}
+
+  .expect-list{display:flex; flex-direction:column;}
+  .expect-row{
+    display:grid; grid-template-columns:44px 1fr; gap:16px;
+    padding:22px 0; border-top:1px solid var(--line); align-items:start;
+  }
+  .expect-list .expect-row:last-child{border-bottom:1px solid var(--line);}
+  .expect-row .avatar{margin-top:2px;}
+  .expect-row strong{font-family:var(--sans-display); font-size:.98rem; display:block;}
+  .expect-row p{color:var(--ink-soft); font-size:.9rem; margin-top:4px; max-width:44ch;}
+  .expect-foot{
+    margin-top:28px; display:flex; gap:18px; flex-wrap:wrap;
+  }
+  .expect-foot a{font-size:.85rem;}
+
+  /* ---- Form card ---- */
+  .form-card{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius-xl); padding:36px;
+    box-shadow:var(--shadow-lg);
+  }
+  .form-card-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:26px;}
+  .form-card-head strong{font-family:var(--sans-display); font-size:1rem;}
+  .form-card-head .badge{color:var(--success); background:var(--success-light); border-color:transparent;}
+
+  .form-field{margin-bottom:18px;}
+  .form-field label{
+    display:block; font-size:.8rem; font-weight:700; color:var(--ink); margin-bottom:7px;
+  }
+  .form-field input, .form-field textarea{
+    width:100%; border:1px solid var(--line); background:var(--paper);
+    border-radius:var(--radius-sm); padding:13px 14px; color:var(--ink);
+    outline:none; font-family:var(--sans); font-size:.94rem;
+    transition:border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+  }
+  .form-field input::placeholder, .form-field textarea::placeholder{color:var(--ink-faint);}
+  .form-field input:focus, .form-field textarea:focus{
+    border-color:var(--blue); box-shadow:0 0 0 4px color-mix(in srgb, var(--blue) 12%, transparent);
+  }
+  .form-field textarea{min-height:140px; resize:vertical;}
+  .form-note{font-size:.78rem; color:var(--ink-faint); margin-top:14px;}
+
+  #contact-status{
+    display:none; margin-top:20px; padding:14px 16px; border-radius:var(--radius-md);
+    background:var(--success-light); color:var(--success);
+    font-size:.88rem; font-weight:600;
+  }
+  #contact-status.is-visible{display:block;}
+
+  /* ============ Footer ============ */
+  .site-footer{background:var(--deep); border-top:1px solid var(--line-dark); color:var(--white-faint); padding:42px 0;}
+  .footer-inner{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .footer-inner .brand{color:#fff;}
+  .footer-inner .brand .brand-word{font-size:1rem;}
+  .footer-tag{font-size:.8rem; margin-top:10px; color:var(--white-faint);}
+  .footer-links{display:flex; gap:22px; font-size:.84rem; padding-top:6px;}
+  .footer-links a{color:var(--white-dim); transition:color var(--speed) var(--ease);}
+  .footer-links a:hover{color:#fff;}
+
+  /* ============ Responsive ============ */
+  @media (max-width: 900px){
+    .contact-grid{grid-template-columns:1fr; gap:44px;}
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+    .nav-actions .text-link{display:none;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    .page-head{padding:56px 0 52px;}
+    .contact-main{padding:52px 0 72px;}
+    .form-card{padding:26px 20px;}
+    .footer-inner{flex-direction:column;}
+  }
+</style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="navbar-inner">
-      <a href="index.html" class="brand">
-<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
-        <span class="brand-word">Elio</span>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="brand" aria-label="Elio home">
+        <img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">elio</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a href="index.html#how-it-works">How It Works</a>
-        <a href="index.html#what-elio-does">What Elio Does</a>
-        <a href="index.html#integrations">Integrations</a>
+        <a href="index.html#product">Product</a>
+        <a href="index.html#control">How it works</a>
+        <a href="index.html#mcp">MCP</a>
         <a href="index.html#faq">FAQ</a>
       </nav>
       <div class="nav-actions">
-        <a href="waitlist.html" class="btn btn-primary">Join the Waitlist →</a>
-        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <a href="login.html" class="text-link on-dark">Sign in</a>
+        <a href="signup.html" class="btn btn-primary">Try the MVP</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
-    <nav class="mobile-menu" aria-label="Mobile">
-      <a href="index.html#how-it-works">How It Works</a>
-      <a href="index.html#what-elio-does">What Elio Does</a>
-      <a href="index.html#integrations">Integrations</a>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="index.html#product">Product</a>
+      <a href="index.html#control">How it works</a>
+      <a href="index.html#mcp">MCP</a>
       <a href="index.html#faq">FAQ</a>
-      <a href="waitlist.html" class="btn btn-primary btn-block">Join the Waitlist →</a>
+      <a href="login.html">Sign in</a>
+      <a href="signup.html" class="btn btn-primary">Try the MVP</a>
     </nav>
   </header>
 
-  <main class="contact-form">
-    <div class="section-header" style="text-align:left; margin-bottom:32px;">
-      <h1 class="section-title">Get in Touch</h1>
-      <p class="section-subtitle">Have a question about Elio? Send us a message below.</p>
+  <main>
+
+    <!-- Page head — one job: set the tone -->
+    <section class="page-head">
+      <div class="container">
+        <span class="eyebrow on-dark">Contact</span>
+        <h1>Talk to a <span class="serif-accent">human.</span></h1>
+        <p class="lede">Questions about Elio, trouble with your workspace, or something about your data? Send a message — the founding team reads every one.</p>
+      </div>
+    </section>
+
+    <div class="contact-main">
+      <div class="container contact-grid">
+
+        <!-- What to expect -->
+        <aside>
+          <div class="expect-list">
+            <div class="expect-row">
+              <span class="avatar" aria-hidden="true">e</span>
+              <div>
+                <strong>What happens next</strong>
+                <p>A human on the founding team reads your message and replies to most within two business days.</p>
+              </div>
+            </div>
+            <div class="expect-row">
+              <span class="avatar ghost" aria-hidden="true">!</span>
+              <div>
+                <strong>Reporting a bug</strong>
+                <p>Tell us what you clicked, what you expected, and what happened instead. Screenshots welcome.</p>
+              </div>
+            </div>
+            <div class="expect-row">
+              <span class="avatar ghost" aria-hidden="true">🔒</span>
+              <div>
+                <strong>Privacy &amp; data requests</strong>
+                <p>Ask any time to see or remove your waitlist or workspace details — we handle these first.</p>
+              </div>
+            </div>
+          </div>
+          <div class="expect-foot">
+            <a class="text-link" href="privacy.html">Read the privacy policy</a>
+            <a class="text-link" href="terms.html">Read the terms</a>
+          </div>
+        </aside>
+
+        <!-- Form -->
+        <section class="form-card" aria-label="Contact form">
+          <div class="form-card-head">
+            <strong>Send a message</strong>
+            <span class="badge">Usually replies in ~2 days</span>
+          </div>
+          <form id="contact-form">
+            <div class="form-field">
+              <label for="contact-name">Your name</label>
+              <input type="text" id="contact-name" name="name" placeholder="Alex Morgan" required />
+            </div>
+            <div class="form-field">
+              <label for="contact-email">Email address</label>
+              <input type="email" id="contact-email" name="email" placeholder="alex@yourbusiness.com" required />
+            </div>
+            <div class="form-field">
+              <label for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" placeholder="What can we help with?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send message</button>
+            <p id="contact-status" role="status">Thanks for reaching out — your message is noted. During the private build this form is a placeholder confirmation, and a real inbox is on its way.</p>
+            <p class="form-note">Prefer self-serve? Most answers live in the <a class="text-link" href="index.html#faq">FAQ</a>.</p>
+          </form>
+        </section>
+
+      </div>
     </div>
 
-    <form id="contact-form">
-      <div class="form-field">
-        <label for="contact-name">Full Name</label>
-        <input type="text" id="contact-name" name="name" required />
-      </div>
-      <div class="form-field">
-        <label for="contact-email">Email Address</label>
-        <input type="email" id="contact-email" name="email" required />
-      </div>
-      <div class="form-field">
-        <label for="contact-message">Message</label>
-        <textarea id="contact-message" name="message" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">Send Message</button>
-      <p id="contact-status" style="margin-top:16px; font-size:0.9rem; color:var(--secondary-text); display:none;">
-        Thanks for reaching out — this is a placeholder confirmation for the pre-launch site.
-      </p>
-    </form>
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-bottom">
-        <p>© 2026 Elio. All rights reserved.</p>
+    <div class="container footer-inner">
+      <div>
+        <a href="index.html" class="brand"><img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" /><span class="brand-word">elio</span></a>
+        <p class="footer-tag">Less busywork. More business. © 2026 Elio.</p>
+      </div>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
       </div>
     </div>
   </footer>
 
-<script src="main.js"></script>
   <script>
-    // Placeholder handler: this pre-launch site has no backend for
-    // contact messages yet, so we simply show a confirmation note.
-    document.getElementById("contact-form").addEventListener("submit", function (event) {
+    // Mobile nav
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.style.display === 'flex';
+      mobileMenu.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      mobileMenu.style.display = 'none';
+      navToggle.setAttribute('aria-expanded', 'false');
+    }));
+
+    // Contact form — placeholder confirmation until a backend inbox exists
+    document.getElementById('contact-form').addEventListener('submit', event => {
       event.preventDefault();
-      document.getElementById("contact-status").style.display = "block";
+      document.getElementById('contact-status').classList.add('is-visible');
       event.target.reset();
     });
   </script>

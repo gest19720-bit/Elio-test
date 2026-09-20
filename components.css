@@ -726,10 +726,13 @@ body[data-page] .field textarea::placeholder{color:var(--text-tertiary)}
 }
 
 /* =========================================================
-   MCP PAGES
+   MCP PAGES — redesigned dashboard
+   Server hero, capability explorer, external services,
+   client permission cards, and the activity table.
    ========================================================= */
 
-.mcp-loading{font-size:14px;color:var(--text-secondary);padding:8px 0}
+.mcp-loading{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);padding:8px 0}
+.mcp-loading .spinner{color:var(--elio-blue)}
 .mcp-help{font-size:12.5px;margin-top:8px}
 .mcp-help code{
   background:var(--surface-secondary);
@@ -737,59 +740,195 @@ body[data-page] .field textarea::placeholder{color:var(--text-tertiary)}
   padding:1px 6px;
   font-size:11.5px;
 }
-.mcp-server-card{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:18px;
-  background:linear-gradient(140deg, var(--surface) 55%, var(--elio-blue-light));
+
+/* ---- Skeleton while the overview loads ---- */
+.mcp-loading-card{margin-bottom:18px}
+.mcp-skeleton-zone{display:grid;gap:18px}
+.mcp-skel-row{
+  height:110px;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(100deg, var(--surface-secondary) 40%, var(--surface) 50%, var(--surface-secondary) 60%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite linear;
 }
-.mcp-server-card p{margin-top:6px;font-size:12.5px;word-break:break-all}
-.mcp-metrics{grid-template-columns:repeat(4,1fr);margin-bottom:22px}
-.mcp-list{display:grid;gap:14px}
-.mcp-connection{margin-bottom:0}
-.mcp-meta{
+.mcp-skel-row--tall{height:190px}
+
+/* ---- Server hero ---- */
+.mcp-hero{
+  position:relative;
+  overflow:hidden;
+  margin-bottom:22px;
+  padding:26px 28px;
+  border:0;
+  background:
+    radial-gradient(560px 260px at 88% 0%, rgba(231,176,85,.16), transparent 62%),
+    radial-gradient(680px 340px at 6% 110%, rgba(49,87,232,.28), transparent 60%),
+    linear-gradient(150deg, var(--deep) 0%, var(--deep-2) 58%, var(--deep-3) 100%);
+  color:var(--white);
+}
+.mcp-hero-glow{
+  position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size:22px 22px;
+  mask-image:radial-gradient(circle at 78% 26%, black, transparent 72%);
+  pointer-events:none;
+}
+.mcp-hero--offline{
+  background:
+    radial-gradient(560px 260px at 88% 0%, rgba(231,176,85,.10), transparent 62%),
+    radial-gradient(680px 340px at 6% 110%, rgba(210,74,53,.20), transparent 60%),
+    linear-gradient(150deg, var(--deep) 0%, var(--deep-2) 58%, var(--deep-3) 100%);
+}
+.mcp-hero-body{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;position:relative}
+.mcp-hero-id{display:flex;align-items:center;gap:16px;min-width:0}
+.mcp-hero-mark{
+  width:52px;height:52px;flex-shrink:0;
+  border-radius:16px;
+  display:grid;place-items:center;
+  font-family:var(--sans-display);
+  font-weight:800;font-size:22px;
+  background:linear-gradient(140deg, var(--elio-blue), #6b86f5);
+  color:var(--white);
+  box-shadow:0 10px 24px rgba(49,87,232,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.mcp-hero-title{min-width:0}
+.mcp-hero-title .eyebrow{color:var(--elio-amber)}
+.mcp-hero-title h2{color:var(--white);font-size:22px}
+.mcp-hero-endpoint{
+  display:flex;align-items:center;gap:6px;
+  margin-top:8px;min-width:0;
+}
+.mcp-hero-endpoint code{
+  font-size:12px;color:var(--white-dim);
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line-dark);
+  border-radius:8px;
+  padding:4px 10px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  max-width:min(520px,100%);
+}
+.mcp-hero-endpoint .mcp-copy{
+  color:rgba(255,255,255,.75);
+  padding:5px 8px;font-size:12px;flex-shrink:0;
+}
+.mcp-hero-endpoint .mcp-copy:hover{background:rgba(255,255,255,.12);color:var(--white)}
+.mcp-hero-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.mcp-status-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;
+  border-radius:var(--radius-pill);
+  font-size:12px;font-weight:700;letter-spacing:.02em;
+  background:rgba(47,158,106,.22);
+  color:#7fd8ab;
+  box-shadow:inset 0 0 0 1px rgba(47,158,106,.4);
+}
+.mcp-hero--offline .mcp-status-pill{
+  background:rgba(231,176,85,.18);
+  color:#f0c987;
+  box-shadow:inset 0 0 0 1px rgba(231,176,85,.4);
+}
+.mcp-status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb, currentColor 22%, transparent)}
+.mcp-hero--live .mcp-status-dot{animation:mcpPulse 2.2s ease-in-out infinite}
+@keyframes mcpPulse{50%{opacity:.45}}
+.mcp-hero-version{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.04em}
+.mcp-hero-stats{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  grid-template-columns:repeat(4,1fr);
   gap:12px;
-  margin:14px 0;
-  padding:13px 15px;
-  background:var(--surface-sunken);
-  border:1px solid var(--border);
-  border-radius:var(--radius-md);
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line-dark);
+  position:relative;
 }
-.mcp-meta strong{display:block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:2px}
-.mcp-meta span{font-size:13px;font-weight:600}
-.mcp-scopes{margin-bottom:16px}
-.mcp-scopes strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary);margin-bottom:7px}
-.mcp-scopes div{display:flex;flex-wrap:wrap;gap:6px}
-
-.mcp-capability-group{margin-bottom:16px}
-.mcp-capability-group > strong{
+.mcp-hero-stat strong{
   display:block;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:var(--text-tertiary);
-  margin-bottom:8px;
+  font-family:var(--sans-display);
+  font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.1;
+  color:var(--white);
 }
-.mcp-capability{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:9px 11px;
-  border:1px solid var(--surface-secondary);
-  border-radius:var(--radius-xs);
-  margin-bottom:6px;
-  transition:border-color var(--speed) var(--ease);
-}
-.mcp-capability:hover{border-color:var(--border-strong)}
-.mcp-capability code{font-size:12px;color:var(--elio-blue);font-weight:600}
-.mcp-capability span{font-size:12px;color:var(--text-secondary)}
-.mcp-capability > div{min-width:0}
-.mcp-capability > div span{display:block;margin-top:2px}
+.mcp-hero-stat span{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.mcp-hero-note{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.6);position:relative}
 
+/* ---- Count chips & mini empty states ---- */
+[hidden]{display:none!important}
+.mcp-count-chip{
+  display:inline-flex;align-items:center;
+  padding:4px 12px;
+  border-radius:var(--radius-pill);
+  background:var(--surface-secondary);
+  font-size:11.5px;font-weight:700;color:var(--text-secondary);
+  white-space:nowrap;flex-shrink:0;
+}
+.mcp-mini-empty{
+  border:1px dashed var(--border-strong);
+  border-radius:var(--radius-md);
+  padding:22px 18px;
+  text-align:center;
+  display:grid;gap:5px;justify-items:center;
+}
+.mcp-mini-empty strong{font-size:13.5px;color:var(--text-primary)}
+.mcp-mini-empty p{font-size:12.5px;max-width:44ch}
+
+/* ---- Capability explorer ---- */
+.mcp-grid{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}
+.mcp-cap-toolbar{display:grid;gap:10px;margin-bottom:14px}
+.mcp-cap-tabs{display:flex;gap:4px;background:var(--surface-secondary);border-radius:var(--radius-sm);padding:4px}
+.mcp-cap-tab{
+  flex:1;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:12.5px;font-weight:700;color:var(--text-secondary);
+  transition:background var(--speed) var(--ease), color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+}
+.mcp-cap-tab span{
+  font-size:10.5px;font-weight:800;
+  padding:1px 7px;border-radius:999px;
+  background:var(--surface);color:var(--text-tertiary);
+}
+.mcp-cap-tab:hover{color:var(--text-primary)}
+.mcp-cap-tab.active{
+  background:var(--surface);color:var(--elio-blue);
+  box-shadow:var(--shadow-sm);
+}
+.mcp-cap-tab.active span{background:var(--elio-blue-light);color:var(--elio-blue)}
+.mcp-cap-search{
+  width:100%;
+  border:1px solid var(--border);
+  background:var(--surface-sunken);
+  border-radius:var(--radius-sm);
+  padding:9px 13px;
+  font-size:13px;color:var(--text-primary);
+  outline:none;
+  transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+.mcp-cap-search:focus{border-color:var(--elio-blue);background:var(--surface);box-shadow:0 0 0 3px var(--elio-blue-light)}
+.mcp-cap-search::placeholder{color:var(--text-tertiary)}
+.mcp-cap-panel{display:grid;gap:6px}
+.mcp-cap-empty{font-size:12.5px;color:var(--text-tertiary);padding:10px 2px}
+.mcp-capability{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--surface-secondary);
+  border-radius:var(--radius-sm);
+  transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+.mcp-capability:hover{border-color:var(--border-strong);background:var(--surface-sunken)}
+.mcp-cap-icon{
+  width:30px;height:30px;flex-shrink:0;
+  border-radius:9px;
+  display:grid;place-items:center;
+  font-size:12px;
+  background:var(--elio-blue-light);color:var(--elio-blue);
+}
+.mcp-cap-icon--write{background:var(--warning-light);color:var(--warning)}
+.mcp-cap-icon--prompt{background:var(--surface-secondary);color:var(--text-secondary)}
+.mcp-cap-text{flex:1;min-width:0}
+.mcp-capability code{font-size:12.5px;color:var(--elio-blue);font-weight:600}
+.mcp-cap-text span{display:block;font-size:12px;color:var(--text-secondary);margin-top:1px}
+
+/* ---- Aside: external services & quick start ---- */
+.mcp-aside{gap:22px}
 .mcp-external{
   border:1px solid var(--border);
   border-radius:var(--radius-md);
@@ -797,36 +936,94 @@ body[data-page] .field textarea::placeholder{color:var(--text-tertiary)}
   margin-bottom:12px;
   background:var(--surface-sunken);
 }
+.mcp-external:last-child{margin-bottom:0}
 .mcp-external .section-title{margin-bottom:10px}
 .mcp-external p{font-size:12.5px}
+.mcp-external-url{font-size:11.5px;word-break:break-all}
+.mcp-external-actions{margin-top:12px;flex-wrap:wrap}
+.mcp-external-actions .btn{padding:6px 11px;font-size:12px}
+.mcp-quickstart{
+  background:linear-gradient(170deg, var(--surface) 55%, var(--elio-blue-light));
+}
+.mcp-quickstart-intro{font-size:13px;margin-top:10px}
+.mcp-quickstart-steps{display:grid;gap:9px;margin-top:14px}
+.mcp-quickstart-steps > div{display:flex;align-items:center;gap:11px}
+.mcp-quickstart-steps strong{
+  width:24px;height:24px;flex-shrink:0;
+  border-radius:8px;
+  display:grid;place-items:center;
+  background:var(--elio-blue-light);color:var(--elio-blue);
+  font-size:11.5px;font-weight:800;
+}
+.mcp-quickstart-steps span{font-size:13px;font-weight:600;color:var(--text-primary)}
+.mcp-quickstart-note{margin-top:12px;font-size:11.5px;color:var(--text-tertiary)}
 
+/* ---- Client permission cards ---- */
+.mcp-clients-card{margin-top:22px}
+.mcp-client-search{
+  border:1px solid var(--border);
+  background:var(--surface-sunken);
+  border-radius:var(--radius-sm);
+  padding:8px 12px;
+  font-size:12.5px;color:var(--text-primary);
+  outline:none;
+  transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+  flex-shrink:0;
+}
+.mcp-client-search:focus{border-color:var(--elio-blue);background:var(--surface);box-shadow:0 0 0 3px var(--elio-blue-light)}
+.mcp-client-search::placeholder{color:var(--text-tertiary)}
 .mcp-permission-card{
   border:1px solid var(--border);
   border-radius:var(--radius-md);
   padding:18px;
   margin-bottom:14px;
+  transition:border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
+.mcp-permission-card:last-child{margin-bottom:0}
+.mcp-permission-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.mcp-permission-card[data-revoked]{opacity:.72;background:var(--surface-sunken)}
 .mcp-permission-card .section-title{margin-bottom:14px}
+.mcp-client-id{display:flex;align-items:center;gap:12px;min-width:0}
+.mcp-client-mark{
+  width:38px;height:38px;flex-shrink:0;
+  border-radius:12px;
+  display:grid;place-items:center;
+  background:var(--elio-blue-light);color:var(--elio-blue);
+  font-family:var(--sans-display);
+  font-size:13px;font-weight:800;
+}
+.mcp-permission-card[data-revoked] .mcp-client-mark{background:var(--surface-secondary);color:var(--text-tertiary)}
+.mcp-permission-card h4{font-size:14px}
 .mcp-permissions{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
   gap:8px;
 }
 .mcp-permission{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
+  display:flex;align-items:flex-start;gap:10px;
   padding:10px 12px;
   border:1px solid var(--surface-secondary);
   border-radius:var(--radius-xs);
   cursor:pointer;
-  transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+  transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
 }
 .mcp-permission:hover{border-color:var(--border-strong);background:var(--surface-sunken)}
+.mcp-permission.is-granted{border-color:color-mix(in srgb, var(--elio-blue) 35%, var(--surface-secondary));background:var(--elio-blue-light)}
+.mcp-permission.is-granted:hover{border-color:var(--elio-blue)}
 .mcp-permission input{accent-color:var(--elio-blue);margin-top:3px}
+.mcp-permission input:disabled{cursor:not-allowed}
 .mcp-permission strong{display:block;font-size:12.5px}
 .mcp-permission small{display:block;font-size:10.5px;color:var(--text-tertiary);margin-top:1px}
 .mcp-endpoint{margin-top:12px;font-size:12px;word-break:break-all}
+
+/* ---- Activity table ---- */
+.mcp-result{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;
+}
+.mcp-result::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.mcp-result--ok{color:var(--success)}
+.mcp-result--fail{color:var(--danger)}
 
 /* =========================================================
    ASSISTANT

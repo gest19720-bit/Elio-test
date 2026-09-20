@@ -1,75 +1,364 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy — Elio</title>
-  <meta name="description" content="How Elio collects and uses information from waitlist signups." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — Elio</title>
+<meta name="description" content="How Elio handles information from the waitlist, the MVP workspace, and MCP connections." />
 <link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
-<link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="responsive.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+  /* =========================================================
+     ELIO — PRIVACY POLICY
+     Same design language as the landing page and the product.
+     ========================================================= */
+  :root{
+    --paper:        #fbfaf6;
+    --paper-dim:    #f2f0e8;
+    --ink:          #12181f;
+    --ink-soft:     #5c6570;
+    --ink-faint:    #97a0a8;
+    --line:         #e6e2d5;
+
+    --deep:         #0b0f16;
+    --line-dark:    rgba(255,255,255,.09);
+    --white:        #ffffff;
+    --white-dim:    rgba(255,255,255,.68);
+
+    --blue:         #3157e8;
+    --blue-light:   #ecf0fe;
+    --amber:        #e7b055;
+    --amber-deep:   #b97f24;
+
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+    --sans-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    --radius-sm:   11px;
+    --radius-md:   14px;
+    --radius-lg:   20px;
+    --radius-xl:   26px;
+    --pill:        999px;
+
+    --shadow-md:   0 10px 30px rgba(15,23,42,.08);
+    --speed: .18s;
+    --ease: ease;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+  }
+
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:var(--sans-display); color:var(--ink); margin:0; letter-spacing:-.015em; line-height:1.2;}
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  .container{max-width:1180px; margin:0 auto; padding:0 32px;}
+  .serif-accent{font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:0;}
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--blue); outline-offset:3px; border-radius:4px;
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--blue);
+  }
+  .eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:currentColor;
+    box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  }
+  .eyebrow.on-dark{color:var(--amber);}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:var(--pill);
+    background:var(--paper-dim); color:var(--ink-soft); border:1px solid var(--line);
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    padding:13px 24px; border-radius:var(--pill);
+    font-weight:700; font-size:.94rem; border:1px solid transparent;
+    transition:transform var(--speed) var(--ease), background var(--speed) var(--ease);
+  }
+  .btn-primary{background:var(--blue); color:#fff; box-shadow:0 10px 22px rgba(49,87,232,.22);}
+  .btn-primary:hover{background:#2747c9; transform:translateY(-2px);}
+  .text-link{
+    font-size:.92rem; font-weight:600; color:var(--ink-soft);
+    border-bottom:1px solid transparent; padding-bottom:1px;
+  }
+  .text-link:hover{color:var(--ink); border-color:var(--ink);}
+  .text-link.on-dark{color:var(--white-dim); border-bottom-color:rgba(255,255,255,.25);}
+  .text-link.on-dark:hover{color:#fff; border-color:#fff;}
+
+  /* ============ Nav ============ */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(11,15,22,.86);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-dark);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:15px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; color:var(--white);}
+  .brand-mark{width:32px; height:32px; border-radius:9px; object-fit:cover;}
+  .brand-word{font-family:var(--sans-display); font-weight:800; font-size:1.1rem; letter-spacing:-.02em;}
+  .nav-links{display:flex; gap:30px;}
+  .nav-links a{color:var(--white-dim); font-size:.88rem; font-weight:500; transition:color var(--speed) var(--ease);}
+  .nav-links a:hover{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:18px;}
+  .nav-actions .btn{padding:10px 19px; font-size:.86rem;}
+  .nav-toggle{display:none; background:none; border:none; width:34px; height:26px; position:relative;}
+  .nav-toggle span{position:absolute; left:4px; right:4px; height:2px; background:#fff; border-radius:2px;}
+  .nav-toggle span:nth-child(1){top:4px;} .nav-toggle span:nth-child(2){top:12px;} .nav-toggle span:nth-child(3){top:20px;}
+  .mobile-menu{
+    display:none; background:var(--deep); border-bottom:1px solid var(--line-dark);
+    padding:6px 32px 24px; flex-direction:column; gap:14px;
+  }
+  .mobile-menu a{color:var(--white-dim); font-weight:500; padding:4px 0;}
+  .mobile-menu .btn{margin-top:8px;}
+
+  /* ============ Page head ============ */
+  .page-head{
+    background:
+      radial-gradient(760px 420px at 85% -20%, rgba(49,87,232,.2), transparent 62%),
+      var(--deep);
+    color:var(--white); padding:76px 0 72px;
+  }
+  .page-head-inner{max-width:760px;}
+  .page-head h1{color:var(--white); font-size:clamp(2.1rem, 3.6vw, 3rem); letter-spacing:-.03em; margin-top:16px;}
+  .page-head h1 .serif-accent{color:var(--amber);}
+  .page-head .lede{margin-top:16px; color:var(--white-dim); font-size:1.05rem; max-width:54ch;}
+  .updated-pill{
+    display:inline-flex; align-items:center; gap:8px; margin-top:22px;
+    font-size:.78rem; font-weight:600; color:var(--white-dim);
+    border:1px solid var(--line-dark); border-radius:var(--pill); padding:7px 15px;
+  }
+  .updated-pill::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--amber);}
+
+  /* ============ Article ============ */
+  .legal-main{padding:72px 0 104px;}
+  .legal-grid{display:grid; grid-template-columns:240px 1fr; gap:56px; align-items:start;}
+  .legal-toc{position:sticky; top:96px; display:flex; flex-direction:column; gap:2px;}
+  .legal-toc span{
+    font-size:.68rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:10px;
+  }
+  .legal-toc a{
+    font-size:.84rem; color:var(--ink-soft); padding:6px 0;
+    border-left:2px solid transparent; padding-left:14px; margin-left:-16px;
+    transition:color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+  }
+  .legal-toc a:hover{color:var(--ink); border-color:var(--blue);}
+
+  .legal-doc{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius-xl); padding:44px 48px;
+    box-shadow:var(--shadow-md);
+    max-width:780px;
+  }
+  .placeholder-note{
+    display:flex; gap:12px; align-items:flex-start;
+    background:#fdf3e2; border-radius:var(--radius-md);
+    padding:14px 16px; margin-bottom:34px;
+    font-size:.84rem; color:var(--amber-deep);
+  }
+  .placeholder-note strong{font-weight:700;}
+  .legal-doc h2{font-size:1.18rem; letter-spacing:-.01em; margin:36px 0 12px; scroll-margin-top:96px;}
+  .legal-doc h2:first-of-type{margin-top:0;}
+  .legal-doc p{color:var(--ink-soft); font-size:.95rem; margin-bottom:12px;}
+  .legal-doc ul{margin:0 0 12px; padding-left:20px; color:var(--ink-soft); font-size:.95rem;}
+  .legal-doc li{margin-bottom:7px;}
+  .legal-doc a{color:var(--blue); font-weight:600; border-bottom:1px solid color-mix(in srgb, var(--blue) 30%, transparent);}
+  .legal-doc a:hover{border-color:var(--blue);}
+  .legal-doc small{display:block; margin-top:34px; padding-top:18px; border-top:1px solid var(--line); color:var(--ink-faint); font-size:.8rem;}
+
+  /* ============ Footer ============ */
+  .site-footer{background:var(--deep); border-top:1px solid var(--line-dark); color:rgba(255,255,255,.42); padding:42px 0;}
+  .footer-inner{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .footer-inner .brand{color:#fff;}
+  .footer-inner .brand .brand-word{font-size:1rem;}
+  .footer-tag{font-size:.8rem; margin-top:10px; color:rgba(255,255,255,.42);}
+  .footer-links{display:flex; gap:22px; font-size:.84rem; padding-top:6px;}
+  .footer-links a{color:var(--white-dim); transition:color var(--speed) var(--ease);}
+  .footer-links a:hover{color:#fff;}
+
+  /* ============ Responsive ============ */
+  @media (max-width: 900px){
+    .legal-grid{grid-template-columns:1fr; gap:36px;}
+    .legal-toc{position:static; flex-direction:row; flex-wrap:wrap; gap:4px 18px;}
+    .legal-toc span{display:none;}
+    .legal-toc a{border-left:none; padding-left:0; margin-left:0;}
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+    .nav-actions .text-link{display:none;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    .page-head{padding:56px 0 52px;}
+    .legal-main{padding:48px 0 72px;}
+    .legal-doc{padding:28px 22px;}
+    .footer-inner{flex-direction:column;}
+  }
+</style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="navbar-inner">
-      <a href="index.html" class="brand">
-<img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
-        <span class="brand-word">Elio</span>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="brand" aria-label="Elio home">
+        <img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">elio</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a href="index.html#how-it-works">How It Works</a>
-        <a href="index.html#what-elio-does">What Elio Does</a>
-        <a href="index.html#integrations">Integrations</a>
+        <a href="index.html#product">Product</a>
+        <a href="index.html#control">How it works</a>
+        <a href="index.html#mcp">MCP</a>
         <a href="index.html#faq">FAQ</a>
       </nav>
       <div class="nav-actions">
-        <a href="waitlist.html" class="btn btn-primary">Join the Waitlist →</a>
-        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <a href="login.html" class="text-link on-dark">Sign in</a>
+        <a href="signup.html" class="btn btn-primary">Try the MVP</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
-    <nav class="mobile-menu" aria-label="Mobile">
-      <a href="index.html#how-it-works">How It Works</a>
-      <a href="index.html#what-elio-does">What Elio Does</a>
-      <a href="index.html#integrations">Integrations</a>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="index.html#product">Product</a>
+      <a href="index.html#control">How it works</a>
+      <a href="index.html#mcp">MCP</a>
       <a href="index.html#faq">FAQ</a>
-      <a href="waitlist.html" class="btn btn-primary btn-block">Join the Waitlist →</a>
+      <a href="login.html">Sign in</a>
+      <a href="signup.html" class="btn btn-primary">Try the MVP</a>
     </nav>
   </header>
 
-  <main class="legal-page">
-    <h1>Privacy Policy</h1>
-    <p>Last updated: 2026. This is placeholder content — replace with your reviewed policy before launch.</p>
+  <main>
 
-    <h2>What We Collect</h2>
-    <p>When you join the Elio waitlist, we collect the information you provide in the signup form, including your name, email address, business name, business type and size, the challenges you select, the tools you currently use, and any optional notes you share.</p>
+    <!-- Page head — one job: say what this document covers -->
+    <section class="page-head">
+      <div class="container page-head-inner">
+        <span class="eyebrow on-dark">Privacy Policy</span>
+        <h1>Your data, treated with <span class="serif-accent">respect.</span></h1>
+        <p class="lede">How Elio handles information from the waitlist, your workspace, and the tools you connect.</p>
+        <span class="updated-pill">Last updated: September 2026</span>
+      </div>
+    </section>
 
-    <h2>How We Use It</h2>
-    <ul>
-      <li>To let you know when Elio launches or reaches key milestones.</li>
-      <li>To understand which features to prioritize while building Elio.</li>
-      <li>To track referrals if you were invited by another waitlist member.</li>
-    </ul>
+    <div class="legal-main">
+      <div class="container legal-grid">
 
-    <h2>How We Store It</h2>
-    <p>Waitlist information is stored securely using Supabase. We do not sell your information to third parties.</p>
+        <nav class="legal-toc" aria-label="On this page">
+          <span>On this page</span>
+          <a href="#collect">What we collect</a>
+          <a href="#use">How we use it</a>
+          <a href="#ai">AI features</a>
+          <a href="#mcp">MCP connections</a>
+          <a href="#store">How we store it</a>
+          <a href="#choices">Your choices</a>
+          <a href="#contact">Contact</a>
+        </nav>
 
-    <h2>Your Choices</h2>
-    <p>You can request that we remove your information from the waitlist at any time by contacting us.</p>
+        <article class="legal-doc">
+          <div class="placeholder-note">
+            <span aria-hidden="true">⚠</span>
+            <span><strong>Plain-language draft.</strong> This policy covers the private-build MVP. Have it reviewed by counsel before relying on it at a public launch.</span>
+          </div>
 
-    <h2>Contact</h2>
-    <p>Questions about this policy can be sent through our <a href="contact.html">contact page</a>.</p>
+          <h2 id="collect">What we collect</h2>
+          <p>There are two places Elio holds information about you:</p>
+          <ul>
+            <li><strong>The waitlist.</strong> When you join, we collect what you share in the form: name, email, business name, business type and size, the challenges you select, the tools you use, any optional notes, and the referral code that brought you (if any).</li>
+            <li><strong>Your workspace.</strong> When you create an Elio account, we store the business details you enter and the records you add — customers and leads, products, tasks, approvals, workflow settings, and an activity log of actions taken by you and by Elio.</li>
+          </ul>
+
+          <h2 id="use">How we use it</h2>
+          <ul>
+            <li>To run your workspace: show your dashboard, daily brief, metrics, and records to you and only you.</li>
+            <li>To prepare drafts and summaries — a follow-up draft, an assistant answer, a metric insight — from your own data.</li>
+            <li>To tell you when Elio reaches milestones you asked to hear about, and to prioritize what gets built next.</li>
+            <li>To track waitlist referrals, if you were invited by another member.</li>
+          </ul>
+          <p>We do not sell your information, and we do not use your business data to advertise to anyone.</p>
+
+          <h2 id="ai">AI features</h2>
+          <p>Features like follow-up drafting, Ask Elio, and metric insights send the minimum workspace context needed to a server-side AI function in order to generate a response. Two rules apply:</p>
+          <ul>
+            <li><strong>Nothing is sent or changed without you.</strong> AI output always lands as a draft for your review — in Approvals or as a read-only answer. Elio never messages a customer or edits your records on its own.</li>
+            <li><strong>Answers show their sources.</strong> When Elio answers a question, it shows which parts of your workspace the answer came from.</li>
+          </ul>
+
+          <h2 id="mcp">MCP connections</h2>
+          <p>If you connect an external tool (such as an MCP client) to your workspace:</p>
+          <ul>
+            <li>Access tokens are scoped and read-only by default, and you choose the permissions.</li>
+            <li>Elio stores only a SHA-256 hash of each token — the full token is shown once, when you create it, and cannot be read back.</li>
+            <li>Every request is logged (tool, timestamp, latency, result), and you can revoke a connection at any time, which stops existing clients immediately.</li>
+          </ul>
+
+          <h2 id="store">How we store it</h2>
+          <p>Waitlist and workspace data are stored securely in Supabase with row-level security, so your records are only readable by your own account. AI features run through server-side functions, and API keys for those functions stay on the server — never in your browser.</p>
+
+          <h2 id="choices">Your choices</h2>
+          <ul>
+            <li>Ask us to remove your waitlist details at any time.</li>
+            <li>Delete workspace records yourself, or ask us to delete your account and everything in it.</li>
+            <li>Revoke any MCP connection with one click from the MCP dashboard.</li>
+          </ul>
+
+          <h2 id="contact">Contact</h2>
+          <p>Questions or requests about this policy can be sent through our <a href="contact.html">contact page</a> — privacy requests are handled first.</p>
+
+          <small>© 2026 Elio. This policy may be updated as Elio moves from private build to public launch; material changes will be communicated to account holders.</small>
+        </article>
+
+      </div>
+    </div>
+
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-bottom">
-        <p>© 2026 Elio. All rights reserved.</p>
+    <div class="container footer-inner">
+      <div>
+        <a href="index.html" class="brand"><img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" /><span class="brand-word">elio</span></a>
+        <p class="footer-tag">Less busywork. More business. © 2026 Elio.</p>
+      </div>
+      <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
       </div>
     </div>
   </footer>
 
-<script src="main.js"></script>
+  <script>
+    // Mobile nav
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.style.display === 'flex';
+      mobileMenu.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      mobileMenu.style.display = 'none';
+      navToggle.setAttribute('aria-expanded', 'false');
+    }));
+  </script>
 </body>
 </html>
