@@ -14,7 +14,7 @@
   });
   window.addEventListener('unhandledrejection', event => window.elioBootFailed(event.reason || new Error('The application module rejected during startup.')));
   try {
-    import(new URL('../js/app.js', window.location.href).href).catch(window.elioBootFailed);
+    import(new URL('./app.js', window.location.href).href).catch(window.elioBootFailed);
   } catch (error) {
     window.elioBootFailed(error);
   }

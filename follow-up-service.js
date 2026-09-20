@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 export async function createFollowUpWorkflow({ businessId, customerId, subject, message, suggestedAction, generatedBy }) {
   const { data, error } = await supabase.rpc('create_follow_up_workflow', {

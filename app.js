@@ -1,15 +1,15 @@
-import { supabase, requireSession, getBusiness, friendlyError } from './supabase.js';
+import { supabase, requireSession, getBusiness, friendlyError } from './supabase-client.js';
 import { signOut } from './auth.js';
-import { buildDailyBrief, } from '../services/elio-agent.js';
-import { listTasks, createTask, updateTask, deleteTask } from '../services/task-service.js';
-import { listApprovals, resolveApproval } from '../services/approval-service.js';
-import { listActivities, logActivity } from '../services/activity-service.js';
-import { generateFollowUp } from '../services/ai-service.js';
-import { createFollowUpWorkflow } from '../services/follow-up-service.js';
-import { listCustomers, createCustomer, updateCustomer, deleteCustomer } from '../services/customer-service.js';
-import { listProducts, createProduct, updateProduct, deleteProduct } from '../services/product-service.js';
-import { listMcpConnections, createMcpConnection, revokeMcpConnection, listMcpAccessLog } from '../services/mcp-service.js';
-import { askAssistant } from '../services/assistant-service.js';
+import { buildDailyBrief, } from './elio-agent.js';
+import { listTasks, createTask, updateTask, deleteTask } from './task-service.js';
+import { listApprovals, resolveApproval } from './approval-service.js';
+import { listActivities, logActivity } from './activity-service.js';
+import { generateFollowUp } from './ai-service.js';
+import { createFollowUpWorkflow } from './follow-up-service.js';
+import { listCustomers, createCustomer, updateCustomer, deleteCustomer } from './customer-service.js';
+import { listProducts, createProduct, updateProduct, deleteProduct } from './product-service.js';
+import { listMcpConnections, createMcpConnection, revokeMcpConnection, listMcpAccessLog } from './mcp-service.js';
+import { askAssistant } from './assistant-service.js';
 import { renderMcpPage } from './mcp-page.js';
 import { renderMetricsPage } from './metrics-page.js';
 
@@ -35,7 +35,7 @@ function shell(business) {
   nav.splice(1, 0, ['metrics', '◒', 'Metrics']);
   const links=nav.map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('');
   const name=session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'there';
-  return `<div class="app-shell"><aside class="sidebar"><a class="brand" href="dashboard.html"><img class="brand-mark" src="../elio-logo.jpeg" alt=""><span><strong class="brand-name">elio</strong><small class="brand-sub">The calm behind your business.</small></span></a><nav class="nav" aria-label="Main navigation">${links}</nav><div class="sidebar-spacer"></div><a data-nav="settings" href="settings.html" class="nav"><span class="nav-icon">⚙</span>Settings</a><div class="profile-card"><span class="avatar">${initials(name)}</span><span><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button class="btn btn-quiet" data-logout aria-label="Log out" style="margin-left:auto;padding:5px 7px">↗</button></div></aside><main class="main-content"><div id="app-content"></div></main><nav class="bottom-nav" aria-label="Mobile navigation">${nav.slice(0,6).map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('')}</nav></div>`;
+  return `<div class="app-shell"><aside class="sidebar"><a class="brand" href="dashboard.html"><img class="brand-mark" src="elio-logo.jpeg" alt=""><span><strong class="brand-name">elio</strong><small class="brand-sub">The calm behind your business.</small></span></a><nav class="nav" aria-label="Main navigation">${links}</nav><div class="sidebar-spacer"></div><a data-nav="settings" href="settings.html" class="nav"><span class="nav-icon">⚙</span>Settings</a><div class="profile-card"><span class="avatar">${initials(name)}</span><span><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button class="btn btn-quiet" data-logout aria-label="Log out" style="margin-left:auto;padding:5px 7px">↗</button></div></aside><main class="main-content"><div id="app-content"></div></main><nav class="bottom-nav" aria-label="Mobile navigation">${nav.slice(0,6).map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('')}</nav></div>`;
 }
 
 function header(heading, sub, action='') { return `<header class="page-header"><div><span class="eyebrow">${esc(title)}</span><h1 style="margin-top:7px">${heading}</h1><p>${sub}</p></div>${action?`<div class="header-actions">${action}</div>`:''}</header>`; }
@@ -133,7 +133,7 @@ async function renderConnections(b){const providers=[['Gmail','Communication'],[
 /* ====================================================================
    ASK ELIO — AI assistant page
    A calm conversation surface: dark hero, quick prompts, a composer,
-   and grounded answers from services/assistant-service.js.
+   and grounded answers from assistant-service.js.
    ==================================================================== */
 
 const assistantPrompts = [
@@ -427,7 +427,7 @@ try {
   session = await requireSession();
   if (session) {
     const business = await getBusiness();
-    if (!business) window.location.href = '../onboarding.html'; else await boot(business);
+    if (!business) window.location.href = 'onboarding.html'; else await boot(business);
   }
 } catch (error) {
   showBootError(error);

@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 export async function buildDailyBrief(businessId) {
   const [tasks, approvals, customers] = await Promise.all([

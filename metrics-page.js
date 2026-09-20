@@ -1,6 +1,6 @@
-import { getMetricsRange, loadMetricsData, calculateMetrics } from '../services/metrics-service.js';
-import { getMcpOverview } from '../services/mcp-admin-service.js';
-import { askAssistant } from '../services/assistant-service.js';
+import { getMetricsRange, loadMetricsData, calculateMetrics } from './metrics-service.js';
+import { getMcpOverview } from './mcp-admin-service.js';
+import { askAssistant } from './assistant-service.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const number = value => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });

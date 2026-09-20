@@ -1,11 +1,11 @@
-import { supabase } from './supabase.js';
+import { supabase } from './supabase-client.js';
 
 const requestId = new URLSearchParams(location.search).get('request_id');
 const status = document.querySelector('#oauth-status'); const form = document.querySelector('#oauth-consent'); const scopes = document.querySelector('#oauth-scopes'); const message = document.querySelector('#oauth-message');
 if (!requestId) { status.textContent = 'This authorization request is invalid.'; }
 else {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { const returnTo = `${location.pathname}${location.search}`; location.replace(`../login.html?return_to=${encodeURIComponent(returnTo)}`); }
+  if (!session) { const returnTo = `${location.pathname}${location.search}`; location.replace(`login.html?return_to=${encodeURIComponent(returnTo)}`); }
   else {
     const details = await fetch(`/api/oauth/request-details?request_id=${encodeURIComponent(requestId)}`, { headers: { Authorization: `Bearer ${session.access_token}` } });
     if (!details.ok) { status.textContent = 'This authorization request has expired. Return to your MCP client and try again.'; }

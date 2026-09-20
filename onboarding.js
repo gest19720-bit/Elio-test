@@ -1,5 +1,5 @@
-import { supabase, requireSession, ensureProfile, friendlyError } from './supabase.js';
-import { logActivity } from '../services/activity-service.js';
+import { supabase, requireSession, ensureProfile, friendlyError } from './supabase-client.js';
+import { logActivity } from './activity-service.js';
 
 const session = await requireSession({ redirect: 'login.html' });
 if (session) {
@@ -20,6 +20,6 @@ if (session) {
   form.addEventListener('submit',async event=>{event.preventDefault();const btn=form.querySelector('[type=submit]');btn.disabled=true;setMessage('Elio is setting up your workspace…');try{
     await ensureProfile(session.user, session.user.user_metadata?.full_name || '');
     const {data:business,error}=await supabase.from('businesses').upsert({owner_id:session.user.id,name:state.businessName,industry:state.industry,size:state.size,help_areas:state.helpAreas,communication_style:state.communicationStyle,automation_level:state.automationLevel},{onConflict:'owner_id'}).select().single();if(error)throw error;
-    await supabase.rpc('seed_elio_workflows',{target_business_id:business.id}); await logActivity({businessId:business.id,actor:'System',action:'Completed onboarding',entityType:'business',entityId:business.id}); window.location.href='app/dashboard.html';
+    await supabase.rpc('seed_elio_workflows',{target_business_id:business.id}); await logActivity({businessId:business.id,actor:'System',action:'Completed onboarding',entityType:'business',entityId:business.id}); window.location.href='dashboard.html';
   }catch(error){setMessage(friendlyError(error,'Elio could not save your setup. Please try again.'));btn.disabled=false}}); show(1);
 }

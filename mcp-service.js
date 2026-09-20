@@ -1,4 +1,4 @@
-import { supabase } from '../js/supabase.js';
+import { supabase } from './supabase-client.js';
 
 const encoder = new TextEncoder();
 
