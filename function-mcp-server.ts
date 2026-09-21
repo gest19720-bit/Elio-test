@@ -63,10 +63,13 @@ Deno.serve(async request => {
 
 async function allowed(connection: any, capability: string, access: string, admin: any) {
   const scopes = connection.scopes || [];
-  const requiredScope = access === 'WRITE' ? 'business.write' : 'business.read';
-  const scopeAllows = scopes.includes(requiredScope) || (access === 'READ' && scopes.includes('business.write'));
-  if (!scopeAllows) return false;
-  if (connection.oauth_token_id) return true;
+  if (connection.oauth_token_id) {
+    const requiredScope = access === 'WRITE' ? 'business.write' : 'business.read';
+    return scopes.includes(requiredScope);
+  }
+  // Legacy client tokens predate OAuth and commonly use financial.read.summary.
+  // Retain their established read-default behavior; only business.write can unlock writes.
+  if (access === 'WRITE' && !scopes.includes('business.write')) return false;
   const { data } = await admin.from('mcp_permissions').select('enabled,access_level').eq('connection_id', connection.id).eq('capability_name', capability).maybeSingle();
   if (data) return data.enabled && ['READ', 'WRITE', 'SENSITIVE'].indexOf(data.access_level) >= ['READ', 'WRITE', 'SENSITIVE'].indexOf(access);
   return access === 'READ';

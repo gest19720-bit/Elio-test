@@ -24,8 +24,10 @@ const title = page.charAt(0).toUpperCase()+page.slice(1);
 async function boot(business) {
   document.body.innerHTML = shell(business);
   document.body.classList.add('elio-ready');
-  document.querySelector(`[data-nav="${page}"]`)?.classList.add('active');
-  document.querySelector('[data-logout]').addEventListener('click', signOut);
+  document.querySelectorAll(`[data-nav="${page}"]`).forEach(el => el.classList.add('active'));
+  document.querySelector('.bottom-nav a.active')?.scrollIntoView({block:'nearest',inline:'center'});
+  document.querySelectorAll('[data-logout]').forEach(el => el.addEventListener('click', signOut));
+  wireMobileMenu();
   try { await renderPage(business); } catch (error) { showError(friendlyError(error)); }
 }
 
@@ -35,7 +37,31 @@ function shell(business) {
   nav.splice(1, 0, ['metrics', '◒', 'Metrics']);
   const links=nav.map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('');
   const name=session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'there';
-  return `<div class="app-shell"><aside class="sidebar"><a class="brand" href="dashboard.html"><img class="brand-mark" src="elio-logo.jpeg" alt=""><span><strong class="brand-name">elio</strong><small class="brand-sub">The calm behind your business.</small></span></a><nav class="nav" aria-label="Main navigation">${links}</nav><div class="sidebar-spacer"></div><a data-nav="settings" href="settings.html" class="nav"><span class="nav-icon">⚙</span>Settings</a><div class="profile-card"><span class="avatar">${initials(name)}</span><span><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button class="btn btn-quiet" data-logout aria-label="Log out" style="margin-left:auto;padding:5px 7px">↗</button></div></aside><main class="main-content"><div id="app-content"></div></main><nav class="bottom-nav" aria-label="Mobile navigation">${nav.slice(0,6).map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('')}</nav></div>`;
+  return `<div class="app-shell"><aside class="sidebar"><a class="brand" href="dashboard.html"><img class="brand-mark" src="elio-logo.jpeg" alt=""><span><strong class="brand-name">elio</strong><small class="brand-sub">The calm behind your business.</small></span></a><nav class="nav" aria-label="Main navigation">${links}</nav><div class="sidebar-spacer"></div><a data-nav="settings" href="settings.html" class="nav"><span class="nav-icon">⚙</span>Settings</a><div class="profile-card"><span class="avatar">${initials(name)}</span><span><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button class="btn btn-quiet" data-logout aria-label="Log out" style="margin-left:auto;padding:5px 7px">↗</button></div></aside><main class="main-content"><div id="app-content"></div></main><nav class="bottom-nav" aria-label="Mobile navigation">${nav.slice(0,5).map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('')}<button type="button" class="menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu</button></nav><div class="menu-backdrop" data-menu-close hidden></div><section class="menu-sheet" id="mobile-menu" role="dialog" aria-modal="true" aria-label="All pages" hidden><div class="menu-sheet-header"><span class="avatar">${initials(name)}</span><span class="menu-sheet-id"><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button type="button" class="btn btn-quiet" data-menu-close aria-label="Close menu">×</button></div><nav class="menu-grid" aria-label="All pages">${links}<a data-nav="settings" href="settings.html"><span class="nav-icon">⚙</span>Settings</a></nav><button type="button" class="btn btn-secondary menu-logout" data-logout>Log out</button></section></div>`;
+}
+
+function wireMobileMenu() {
+  const toggle=document.querySelector('[data-menu-toggle]');
+  const sheet=document.querySelector('.menu-sheet');
+  const backdrop=document.querySelector('.menu-backdrop');
+  if(!toggle||!sheet||!backdrop) return;
+  let closeTimer=null;
+  const setOpen=open=>{
+    toggle.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'Close menu':'Open menu');
+    clearTimeout(closeTimer);
+    if(open){
+      backdrop.hidden=false; sheet.hidden=false;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{backdrop.classList.add('open');sheet.classList.add('open');}));
+    } else {
+      backdrop.classList.remove('open'); sheet.classList.remove('open');
+      closeTimer=setTimeout(()=>{backdrop.hidden=true; sheet.hidden=true;},240);
+    }
+  };
+  toggle.addEventListener('click',()=>setOpen(toggle.getAttribute('aria-expanded')!=='true'));
+  sheet.querySelectorAll('[data-menu-close]').forEach(el=>el.addEventListener('click',()=>setOpen(false)));
+  sheet.querySelectorAll('a').forEach(el=>el.addEventListener('click',()=>setOpen(false)));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)setOpen(false);});
 }
 
 function header(heading, sub, action='') { return `<header class="page-header"><div><span class="eyebrow">${esc(title)}</span><h1 style="margin-top:7px">${heading}</h1><p>${sub}</p></div>${action?`<div class="header-actions">${action}</div>`:''}</header>`; }
