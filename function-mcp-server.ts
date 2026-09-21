@@ -65,7 +65,7 @@ async function allowed(connection: any, capability: string, access: string, admi
   const scopes = connection.scopes || [];
   if (connection.oauth_token_id) {
     const requiredScope = access === 'WRITE' ? 'business.write' : 'business.read';
-    return scopes.includes(requiredScope);
+    return scopes.includes(requiredScope) || (access === 'READ' && scopes.includes('business.write'));
   }
   // Legacy client tokens predate OAuth and commonly use financial.read.summary.
   // Retain their established read-default behavior; only business.write can unlock writes.
