@@ -8,6 +8,15 @@ const corsHeaders = (request: Request) => ({
 });
 const json = (request: Request, body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders(request), 'Content-Type': 'application/json' } });
 const safeText = (value: unknown, max: number) => String(value || '').trim().slice(0, max);
+const fetchAllRows = async (queryPage: (from: number, to: number) => any, pageSize = 500) => {
+  const rows: unknown[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await queryPage(from, from + pageSize - 1);
+    if (error) throw error;
+    rows.push(...(data || []));
+    if (!data || data.length < pageSize) return rows;
+  }
+};
 
 Deno.serve(async request => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders(request) });
@@ -30,13 +39,13 @@ Deno.serve(async request => {
       supabase.from('tasks').select('title,status,priority,due_date').eq('business_id', business.id).order('created_at', { ascending: false }).limit(50),
       supabase.from('approvals').select('title,status,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30),
       supabase.from('customers').select('name,company,status,last_contact_at,notes').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(50),
-      supabase.from('products').select('name,category,selling_price,stock,sales,description').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(100),
+      fetchAllRows((from, to) => supabase.from('products').select('id,name,category,selling_price,stock,sales,description').eq('business_id', business.id).order('sales', { ascending: false }).order('id', { ascending: true }).range(from, to)),
       supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30)
     ]);
-    if ([tasks, approvals, customers, products, activities].some(result => result.error)) return json(request, { error: 'Elio could not load your workspace context.' }, 500);
+    if ([tasks, approvals, customers, activities].some(result => result.error)) return json(request, { error: 'Elio could not load your workspace context.' }, 500);
     const prompt = `You are Elio, a calm AI back-office employee. Answer the owner's question using only the supplied workspace data. Never invent facts. Be concise and action-oriented. Do not claim to have sent, changed, deleted, or scheduled anything. If the owner asks for a risky action, explain that approval is required. Return JSON only.
 
-Workspace: ${JSON.stringify({ business, tasks: tasks.data || [], approvals: approvals.data || [], customers: customers.data || [], products: products.data || [], activities: activities.data || [] })}
+Workspace: ${JSON.stringify({ business, tasks: tasks.data || [], approvals: approvals.data || [], customers: customers.data || [], products, activities: activities.data || [] })}
 
 Question: ${question}`;
     const apiKey = Deno.env.get('OPENAI_API_KEY');

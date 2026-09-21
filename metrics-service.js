@@ -2,12 +2,14 @@ import { supabase } from './supabase-client.js';
 
 const day = value => new Date(`${value}T00:00:00`);
 const isoDay = value => value.toISOString().slice(0, 10);
+const MAX_PAGINATED_ROWS = 5000;
 
 export function getMetricsRange(key = '30d', customStart = '', customEnd = '') {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   let start = new Date(today);
   let end = new Date(today); end.setDate(end.getDate() + 1);
+  if (key === 'custom' && (!customStart || !customEnd || customEnd < customStart)) throw new Error('Choose a valid date range where the end date is on or after the start date.');
   if (key === 'today') start = new Date(today);
   if (key === '7d') start.setDate(start.getDate() - 6);
   if (key === '30d') start.setDate(start.getDate() - 29);
@@ -23,18 +25,33 @@ export function getMetricsRange(key = '30d', customStart = '', customEnd = '') {
 
 export async function loadMetricsData(businessId, range) {
   const [products, customers, tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount] = await Promise.all([
-    supabase.from('products').select('id,name,category,cost,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', businessId).order('updated_at', { ascending: false }).limit(500),
-    supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(1000),
+    fetchAllRows((from, to) => supabase.from('products').select('id,name,category,cost,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', businessId).order('sales', { ascending: false }).order('id', { ascending: true }).range(from, to)),
+    fetchAllRows((from, to) => supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId).order('created_at', { ascending: false }).order('id', { ascending: true }).range(from, to)),
     supabase.from('tasks').select('id,title,status,priority,due_date,created_at,updated_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
     supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', range.start).lt('created_at', range.end),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.previousEnd)
   ]);
-  const result = [products, customers, tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount];
+  const result = [tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount];
   const failed = result.find(item => item.error);
   if (failed) throw failed.error;
-  return { products: products.data || [], customers: customers.data || [], tasks: tasks.data || [], activities: activities.data || [], customerCounts: { total: totalCustomerCount.count || 0, current: currentCustomerCount.count || 0, previous: previousCustomerCount.count || 0 }, range };
+  return { products, customers, tasks: tasks.data || [], activities: activities.data || [], customerCounts: { total: totalCustomerCount.count || 0, current: currentCustomerCount.count || 0, previous: previousCustomerCount.count || 0 }, range };
+}
+
+async function fetchAllRows(buildQuery, pageSize = 500, maxRows = MAX_PAGINATED_ROWS) {
+  const rows = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await buildQuery(from, from + pageSize - 1);
+    if (error) throw error;
+    if (from >= maxRows) {
+      if (data?.length) throw new Error(`Metrics are unavailable for workspaces with more than ${maxRows.toLocaleString()} products or customers until server-side aggregation is enabled.`);
+      return rows;
+    }
+    rows.push(...(data || []).slice(0, maxRows - rows.length));
+    if (!data || data.length < pageSize) return rows;
+    if (rows.length >= maxRows) continue;
+  }
 }
 
 export function inRange(value, start, end) { return Boolean(value && value >= start && value < end); }
