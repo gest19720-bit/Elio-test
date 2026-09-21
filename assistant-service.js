@@ -5,6 +5,14 @@ const clean = value => String(value || '').trim();
 
 function localAnswer(question, snapshot) {
   const q = clean(question).toLowerCase();
+  const marketing = snapshot.marketing;
+  if (marketing && /(promot|advertis|best product|bundle|repeat customer|customer segment|marketing)/.test(q)) {
+    const leader = marketing.productMetrics?.top?.[0];
+    if (q.includes('bundle')) return { answer: 'Elio cannot identify frequently purchased-together products because order-line history is not connected yet.', next_steps: ['Connect an authorized order source', 'Record product-level orders'], sources: ['Product catalog'], mode: 'local' };
+    if (q.includes('repeat')) return { answer: 'Repeat-customer rate is not available yet because Elio does not have purchase history in this workspace.', next_steps: ['Connect an authorized order source', 'Keep customer records current'], sources: ['Customers'], mode: 'local' };
+    if (q.includes('customer') || q.includes('segment')) return { answer: `${marketing.customerMetrics?.total || 0} customers are in the available history. Elio needs order value and purchase history before it can identify best or highest-value customers responsibly.`, next_steps: ['Connect order history', 'Add last-contact dates'], sources: ['Customers'], mode: 'local' };
+    return leader ? { answer: `${leader.name} is the strongest promotion candidate from the available catalog data, with ${leader.sales || 0} recorded unit${Number(leader.sales) === 1 ? '' : 's'} sold. This is a suggestion based on recorded units, not a prediction of future demand.`, next_steps: ['Check available stock', 'Review the product details', 'Compare the result after the next campaign'], sources: ['Products'], mode: 'local' } : { answer: 'There is not enough recorded product-sales data to recommend what to promote yet.', next_steps: ['Record product sales', 'Add products to the catalog'], sources: ['Products'], mode: 'local' };
+  }
   const attention = snapshot.approvals.length + snapshot.overdue.length + snapshot.followUps.length;
   if (q.includes('attention') || q.includes('urgent') || q.includes('today')) {
     return {

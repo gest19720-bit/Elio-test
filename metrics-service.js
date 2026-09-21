@@ -11,18 +11,20 @@ export function getMetricsRange(key = '30d', customStart = '', customEnd = '') {
   if (key === 'today') start = new Date(today);
   if (key === '7d') start.setDate(start.getDate() - 6);
   if (key === '30d') start.setDate(start.getDate() - 29);
+  if (key === '90d') start.setDate(start.getDate() - 89);
   if (key === 'thisMonth') start = new Date(today.getFullYear(), today.getMonth(), 1);
+  if (key === 'thisYear') start = new Date(today.getFullYear(), 0, 1);
   if (key === 'lastMonth') { start = new Date(today.getFullYear(), today.getMonth() - 1, 1); end = new Date(today.getFullYear(), today.getMonth(), 1); }
   if (key === 'custom' && customStart && customEnd) { start = day(customStart); end = day(customEnd); end.setDate(end.getDate() + 1); }
   const length = Math.max(1, Math.round((end - start) / 86400000));
   const previousEnd = new Date(start); const previousStart = new Date(start); previousStart.setDate(previousStart.getDate() - length);
-  return { key, start: isoDay(start), end: isoDay(end), previousStart: isoDay(previousStart), previousEnd: isoDay(previousEnd), label: key === 'today' ? 'Today' : key === '7d' ? 'Last 7 days' : key === '30d' ? 'Last 30 days' : key === 'thisMonth' ? 'This month' : key === 'lastMonth' ? 'Last month' : 'Custom range' };
+  return { key, start: isoDay(start), end: isoDay(end), previousStart: isoDay(previousStart), previousEnd: isoDay(previousEnd), label: key === 'today' ? 'Today' : key === '7d' ? 'Last 7 days' : key === '30d' ? 'Last 30 days' : key === '90d' ? 'Last 90 days' : key === 'thisMonth' ? 'This month' : key === 'thisYear' ? 'This year' : key === 'lastMonth' ? 'Last month' : 'Custom range' };
 }
 
 export async function loadMetricsData(businessId, range) {
   const [products, customers, tasks, activities] = await Promise.all([
     supabase.from('products').select('id,name,category,cost,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', businessId).order('updated_at', { ascending: false }).limit(500),
-    supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
+    supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(1000),
     supabase.from('tasks').select('id,title,status,priority,due_date,created_at,updated_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
     supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000)
   ]);
