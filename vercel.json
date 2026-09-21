@@ -23,6 +23,8 @@
     { "src": "mcp-service.js", "use": "@vercel/static" },
     { "src": "metrics-page.js", "use": "@vercel/static" },
     { "src": "metrics-service.js", "use": "@vercel/static" },
+    { "src": "marketing-page.js", "use": "@vercel/static" },
+    { "src": "marketing.css", "use": "@vercel/static" },
     { "src": "onboarding.js", "use": "@vercel/static" },
     { "src": "oauth-consent.js", "use": "@vercel/static" },
     { "src": "product-service.js", "use": "@vercel/static" },
