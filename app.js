@@ -12,6 +12,7 @@ import { listMcpConnections, createMcpConnection, revokeMcpConnection, listMcpAc
 import { askAssistant } from './assistant-service.js';
 import { renderMcpPage } from './mcp-page.js';
 import { renderMetricsPage } from './metrics-page.js';
+import { renderMarketingPage } from './marketing-page.js';
 
 const page = document.body.dataset.page;
 
@@ -35,6 +36,7 @@ function shell(business) {
   const nav=[['dashboard','⌂','Dashboard'],['tasks','✓','Tasks'],['approvals','◌','Approvals'],['activity','↗','Activity'],['customers','♧','Customers'],['products','▦','Products'],['workflows','◇','Workflows'],['connections','⊕','Connections'],['assistant','✦','Ask Elio']];
   nav.splice(8, 0, ['mcp', 'M', 'MCP']);
   nav.splice(1, 0, ['metrics', '◒', 'Metrics']);
+  nav.splice(2, 0, ['marketing', '✦', 'Marketing']);
   const links=nav.map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('');
   const name=session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'there';
   return `<div class="app-shell"><aside class="sidebar"><a class="brand" href="dashboard.html"><img class="brand-mark" src="elio-logo.jpeg" alt=""><span><strong class="brand-name">elio</strong><small class="brand-sub">The calm behind your business.</small></span></a><nav class="nav" aria-label="Main navigation">${links}</nav><div class="sidebar-spacer"></div><a data-nav="settings" href="settings.html" class="nav"><span class="nav-icon">⚙</span>Settings</a><div class="profile-card"><span class="avatar">${initials(name)}</span><span><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button class="btn btn-quiet" data-logout aria-label="Log out" style="margin-left:auto;padding:5px 7px">↗</button></div></aside><main class="main-content"><div id="app-content"></div></main><nav class="bottom-nav" aria-label="Mobile navigation">${nav.slice(0,5).map(([key,icon,label])=>`<a data-nav="${key}" href="${key}.html"><span class="nav-icon">${icon}</span>${label}</a>`).join('')}<button type="button" class="menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu</button></nav><div class="menu-backdrop" data-menu-close hidden></div><section class="menu-sheet" id="mobile-menu" role="dialog" aria-modal="true" aria-label="All pages" hidden><div class="menu-sheet-header"><span class="avatar">${initials(name)}</span><span class="menu-sheet-id"><strong>${esc(name)}</strong><small>${esc(session.user.email)}</small></span><button type="button" class="btn btn-quiet" data-menu-close aria-label="Close menu">×</button></div><nav class="menu-grid" aria-label="All pages">${links}<a data-nav="settings" href="settings.html"><span class="nav-icon">⚙</span>Settings</a></nav><button type="button" class="btn btn-secondary menu-logout" data-logout>Log out</button></section></div>`;
@@ -103,6 +105,7 @@ function toast(message) { const el=document.createElement('div');el.className='t
 async function renderPage(b) {
   if(page==='dashboard') return renderDashboard(b);
   if(page==='metrics') return renderMetricsPage(b);
+  if(page==='marketing') return renderMarketingPage(b);
   if(page==='tasks') return renderTasks(b);
   if(page==='approvals') return renderApprovals(b);
   if(page==='activity') return renderActivity(b);

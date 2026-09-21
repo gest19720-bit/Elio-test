@@ -342,6 +342,7 @@
   .cell-wide{grid-column:span 3;}
   .cell-tall{grid-column:span 3; grid-row:span 2;}
   .cell-quarter{grid-column:span 3;}
+  .cell-full{grid-column:span 6;}
   .bento-eyebrow{display:flex; align-items:center; justify-content:space-between; gap:10px;}
 
   /* mini dashboard visual */
@@ -399,6 +400,29 @@
     font-style:normal; background:var(--blue); color:#fff; border-radius:var(--pill);
     font-size:.62rem; font-weight:700; padding:5px 11px;
   }
+
+  /* marketing visual */
+  .mk-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .mk-panel{
+    background:#fff; border:1px solid var(--border, #e5e8ee); border-radius:10px;
+    padding:12px 13px; min-width:0;
+  }
+  .mk-panel-title{
+    font-size:.62rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:9px;
+  }
+  .mk-insight{display:flex; gap:9px; padding:9px 0; border-top:1px solid var(--border, #e5e8ee);}
+  .mk-insight:first-of-type{border-top:0; padding-top:0;}
+  .mk-insight .glyph{color:var(--blue); font-weight:700; flex:none;}
+  .mk-insight strong{display:block; font-weight:600; font-size:.78rem; color:var(--ink);}
+  .mk-insight small{display:block; font-size:.68rem; color:var(--ink-soft); margin-top:2px; line-height:1.5;}
+  .mk-segments{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+  .mk-segments span{
+    font-size:.68rem; font-weight:700; color:var(--ink-soft);
+    background:var(--paper); border:1px solid var(--line);
+    border-radius:var(--pill); padding:5px 11px;
+  }
+  .mk-segments span b{color:var(--blue); font-weight:800; margin-left:3px;}
 
   /* approvals visual */
   .approval-draft{
@@ -568,7 +592,7 @@
   @media (max-width: 1020px){
     .bento{grid-template-columns:repeat(2, 1fr);}
     .cell-tall{grid-row:auto;}
-    .cell-wide, .cell-tall, .cell-quarter{grid-column:span 1;}
+    .cell-wide, .cell-tall, .cell-quarter, .cell-full{grid-column:span 1;}
     .hero-grid{grid-template-columns:1fr; gap:64px;}
     .hero-visual{max-width:620px;}
     .mcp-grid{grid-template-columns:1fr; gap:52px;}
@@ -592,6 +616,7 @@
     .ws-main{padding:16px;}
     .ws-metrics{grid-template-columns:repeat(3,1fr); gap:6px;}
     .hero-chip{display:none;}
+    .mk-grid{grid-template-columns:1fr;}
     .control-row{grid-template-columns:1fr; gap:14px; padding:30px 0;}
     .control-visual{grid-column:1;}
     .audience-inner > div{gap:16px;}
@@ -796,6 +821,30 @@
             </div>
           </article>
 
+          <!-- Marketing -->
+          <article class="bento-cell cell-full reveal">
+            <div class="bento-eyebrow"><span class="eyebrow">Marketing</span><span class="badge blue">New · Decision support</span></div>
+            <h3>Know your next move before you make it.</h3>
+            <p>Elio reads your customers, products, and recorded sales to surface marketing insights, opportunities, and segments — each with the signal behind it. Grounded in your workspace, never invented.</p>
+            <div class="bento-visual" aria-hidden="true">
+              <div class="mk-grid">
+                <div class="mk-panel">
+                  <div class="mk-panel-title">Elio's Marketing Insights</div>
+                  <div class="mk-insight"><span class="glyph">✦</span><div><strong>Kenya Blend is your strongest recorded product</strong><small>128 recorded units lead the catalog — worth featuring in the next promotion.</small></div></div>
+                  <div class="mk-insight"><span class="glyph">✦</span><div><strong>3 customers may be going quiet</strong><small>No contact recorded in the last 90 days — a reviewed re-engagement could help.</small></div></div>
+                </div>
+                <div class="mk-panel">
+                  <div class="mk-panel-title">Marketing Opportunities</div>
+                  <div class="mini-list" style="margin-top:0;">
+                    <div class="mini-row"><span class="glyph">→</span><strong>Feature Kenya Blend as the campaign anchor</strong><span class="badge amber">Suggested next</span></div>
+                    <div class="mini-row"><span class="glyph">→</span><strong>Re-engage the 3 quiet customers</strong><span class="badge blue">Worth testing</span></div>
+                  </div>
+                  <div class="mk-segments"><span>New customers <b>3</b></span><span>Potentially inactive <b>3</b></span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
           <!-- Products -->
           <article class="bento-cell cell-quarter reveal">
             <div class="bento-eyebrow"><span class="eyebrow">Products</span><span class="badge">Inventory &amp; margin</span></div>
@@ -968,7 +1017,7 @@
         <div class="faq-list">
           <div class="faq-item reveal">
             <button class="faq-question" aria-expanded="false"><span>Is Elio a real product or just a waitlist page?</span><span class="faq-icon" aria-hidden="true">+</span></button>
-            <div class="faq-answer"><p>Both, on purpose. The MVP is live — you can create an account today and use the dashboard, metrics, customers, products, tasks, and approvals right away. The founding group (the waitlist) helps decide what gets built next, and gets early access to what ships.</p></div>
+            <div class="faq-answer"><p>Both, on purpose. The MVP is live — you can create an account today and use the dashboard, metrics, marketing insights, customers, products, tasks, and approvals right away. The founding group (the waitlist) helps decide what gets built next, and gets early access to what ships.</p></div>
           </div>
           <div class="faq-item reveal">
             <button class="faq-question" aria-expanded="false"><span>What can Elio actually do today?</span><span class="faq-icon" aria-hidden="true">+</span></button>
@@ -978,6 +1027,7 @@
                 <li><strong>Customers &amp; leads</strong> — a light CRM with status, notes, and follow-up prep.</li>
                 <li><strong>Products</strong> — catalog, stock, cost, price, margin, and low-stock alerts.</li>
                 <li><strong>Business Metrics</strong> — sales, customer, and task trends for any date range, plus Elio's Take.</li>
+                <li><strong>Marketing</strong> — grounded insights, opportunities, and segments for your next campaign, each with the signal behind it.</li>
                 <li><strong>Approvals</strong> — AI-drafted follow-ups you review before anything is sent.</li>
                 <li><strong>Ask Elio</strong> — answers grounded in your live workspace, with sources shown.</li>
                 <li><strong>MCP</strong> — connect trusted tools with scoped, hashed, logged, revocable tokens.</li>
