@@ -46,22 +46,53 @@ function wireMobileMenu() {
   const backdrop=document.querySelector('.menu-backdrop');
   if(!toggle||!sheet||!backdrop) return;
   let closeTimer=null;
+  let openFrameOne=null;
+  let openFrameTwo=null;
+  let opener=null;
+  const focusable=()=>[...sheet.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>!el.hidden&&el.getClientRects().length);
+  const restoreFocus=()=>{
+    const target=opener?.isConnected?opener:toggle;
+    target.focus();
+    opener=null;
+  };
   const setOpen=open=>{
     toggle.setAttribute('aria-expanded',String(open));
     toggle.setAttribute('aria-label',open?'Close menu':'Open menu');
     clearTimeout(closeTimer);
     if(open){
+      opener=document.activeElement instanceof HTMLElement?document.activeElement:toggle;
       backdrop.hidden=false; sheet.hidden=false;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{backdrop.classList.add('open');sheet.classList.add('open');}));
+      openFrameOne=requestAnimationFrame(()=>{
+        openFrameOne=null;
+        openFrameTwo=requestAnimationFrame(()=>{
+          openFrameTwo=null;
+          if(sheet.hidden||toggle.getAttribute('aria-expanded')!=='true') return;
+          backdrop.classList.add('open');sheet.classList.add('open');focusable()[0]?.focus();
+        });
+      });
     } else {
+      if(openFrameOne!==null){cancelAnimationFrame(openFrameOne);openFrameOne=null;}
+      if(openFrameTwo!==null){cancelAnimationFrame(openFrameTwo);openFrameTwo=null;}
       backdrop.classList.remove('open'); sheet.classList.remove('open');
       closeTimer=setTimeout(()=>{backdrop.hidden=true; sheet.hidden=true;},240);
+      restoreFocus();
     }
   };
   toggle.addEventListener('click',()=>setOpen(toggle.getAttribute('aria-expanded')!=='true'));
   sheet.querySelectorAll('[data-menu-close]').forEach(el=>el.addEventListener('click',()=>setOpen(false)));
+  backdrop.addEventListener('click',()=>setOpen(false));
   sheet.querySelectorAll('a').forEach(el=>el.addEventListener('click',()=>setOpen(false)));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)setOpen(false);});
+  document.addEventListener('keydown',e=>{
+    if(sheet.hidden) return;
+    if(e.key==='Escape'){e.preventDefault();setOpen(false);return;}
+    if(e.key!=='Tab') return;
+    const controls=focusable();
+    if(!controls.length) return;
+    const first=controls[0],last=controls[controls.length-1],active=document.activeElement;
+    if(!sheet.contains(active)){e.preventDefault();(e.shiftKey?last:first).focus();}
+    else if(e.shiftKey&&active===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&active===last){e.preventDefault();first.focus();}
+  });
 }
 
 function header(heading, sub, action='') { return `<header class="page-header"><div><span class="eyebrow">${esc(title)}</span><h1 style="margin-top:7px">${heading}</h1><p>${sub}</p></div>${action?`<div class="header-actions">${action}</div>`:''}</header>`; }
