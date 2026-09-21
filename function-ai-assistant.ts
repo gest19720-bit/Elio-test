@@ -8,6 +8,21 @@ const corsHeaders = (request: Request) => ({
 });
 const json = (request: Request, body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders(request), 'Content-Type': 'application/json' } });
 const safeText = (value: unknown, max: number) => String(value || '').trim().slice(0, max);
+const fetchProductContext = async (supabase: any, businessId: string) => {
+  const select = 'id,name,category,selling_price,stock,sales,description,updated_at';
+  const [top, lowStock, recent] = await Promise.all([
+    supabase.from('products').select(select).eq('business_id', businessId).order('sales', { ascending: false }).order('id', { ascending: true }).limit(50),
+    supabase.from('products').select(select).eq('business_id', businessId).order('stock', { ascending: true }).order('updated_at', { ascending: false }).limit(50),
+    supabase.from('products').select(select).eq('business_id', businessId).order('updated_at', { ascending: false }).order('id', { ascending: true }).limit(50)
+  ]);
+  const failed = [top, lowStock, recent].find(result => result.error);
+  if (failed) throw failed.error;
+  const products = new Map<string, any>();
+  [top.data || [], lowStock.data || [], recent.data || []].flat().forEach(product => {
+    products.set(product.id, { ...product, description: safeText(product.description, 500) });
+  });
+  return [...products.values()];
+};
 
 Deno.serve(async request => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders(request) });
@@ -30,13 +45,13 @@ Deno.serve(async request => {
       supabase.from('tasks').select('title,status,priority,due_date').eq('business_id', business.id).order('created_at', { ascending: false }).limit(50),
       supabase.from('approvals').select('title,status,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30),
       supabase.from('customers').select('name,company,status,last_contact_at,notes').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(50),
-      supabase.from('products').select('name,category,selling_price,stock,sales,description').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(100),
+      fetchProductContext(supabase, business.id),
       supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30)
     ]);
-    if ([tasks, approvals, customers, products, activities].some(result => result.error)) return json(request, { error: 'Elio could not load your workspace context.' }, 500);
+    if ([tasks, approvals, customers, activities].some(result => result.error)) return json(request, { error: 'Elio could not load your workspace context.' }, 500);
     const prompt = `You are Elio, a calm AI back-office employee. Answer the owner's question using only the supplied workspace data. Never invent facts. Be concise and action-oriented. Do not claim to have sent, changed, deleted, or scheduled anything. If the owner asks for a risky action, explain that approval is required. Return JSON only.
 
-Workspace: ${JSON.stringify({ business, tasks: tasks.data || [], approvals: approvals.data || [], customers: customers.data || [], products: products.data || [], activities: activities.data || [] })}
+Workspace: ${JSON.stringify({ business, tasks: tasks.data || [], approvals: approvals.data || [], customers: customers.data || [], products, product_context_note: 'Products include up to 50 top sellers, 50 lowest-stock items, and 50 recently updated items; this is a relevant snapshot, not the complete catalog.', activities: activities.data || [] })}
 
 Question: ${question}`;
     const apiKey = Deno.env.get('OPENAI_API_KEY');

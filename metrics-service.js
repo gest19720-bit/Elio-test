@@ -2,12 +2,15 @@ import { supabase } from './supabase-client.js';
 
 const day = value => new Date(`${value}T00:00:00`);
 const isoDay = value => value.toISOString().slice(0, 10);
+const MAX_PAGINATED_ROWS = 5000;
+const quoteFilterValue = value => `"${String(value).replaceAll('"', '""')}"`;
 
 export function getMetricsRange(key = '30d', customStart = '', customEnd = '') {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   let start = new Date(today);
   let end = new Date(today); end.setDate(end.getDate() + 1);
+  if (key === 'custom' && (!customStart || !customEnd || customEnd < customStart)) throw new Error('Choose a valid date range where the end date is on or after the start date.');
   if (key === 'today') start = new Date(today);
   if (key === '7d') start.setDate(start.getDate() - 6);
   if (key === '30d') start.setDate(start.getDate() - 29);
@@ -22,19 +25,37 @@ export function getMetricsRange(key = '30d', customStart = '', customEnd = '') {
 }
 
 export async function loadMetricsData(businessId, range) {
-  const [products, customers, tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount] = await Promise.all([
-    supabase.from('products').select('id,name,category,cost,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', businessId).order('updated_at', { ascending: false }).limit(500),
-    supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(1000),
+  const [productResult, customerResult, tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount] = await Promise.all([
+    fetchKeysetRows(cursor => { let query = supabase.from('products').select('id,name,category,cost,selling_price,stock,sales,description,created_at,updated_at').eq('business_id', businessId); if (cursor) query = query.or(`sales.lt.${cursor.sales},and(sales.eq.${cursor.sales},id.gt.${cursor.id})`); return query.order('sales', { ascending: false }).order('id', { ascending: true }).limit(500); }, item => ({ sales: item.sales, id: item.id })),
+    fetchKeysetRows(cursor => { let query = supabase.from('customers').select('id,name,company,status,last_contact_at,created_at,updated_at').eq('business_id', businessId); if (cursor) { const createdAt = quoteFilterValue(cursor.created_at); query = query.or(`created_at.lt.${createdAt},and(created_at.eq.${createdAt},id.gt.${cursor.id})`); } return query.order('created_at', { ascending: false }).order('id', { ascending: true }).limit(500); }, item => ({ created_at: item.created_at, id: item.id })),
     supabase.from('tasks').select('id,title,status,priority,due_date,created_at,updated_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
     supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.end).order('created_at', { ascending: false }).limit(1000),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', range.start).lt('created_at', range.end),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', range.previousStart).lt('created_at', range.previousEnd)
   ]);
-  const result = [products, customers, tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount];
+  const result = [tasks, activities, totalCustomerCount, currentCustomerCount, previousCustomerCount];
   const failed = result.find(item => item.error);
   if (failed) throw failed.error;
-  return { products: products.data || [], customers: customers.data || [], tasks: tasks.data || [], activities: activities.data || [], customerCounts: { total: totalCustomerCount.count || 0, current: currentCustomerCount.count || 0, previous: previousCustomerCount.count || 0 }, range };
+  return { products: productResult.rows, customers: customerResult.rows, tasks: tasks.data || [], activities: activities.data || [], customerCounts: { total: totalCustomerCount.count || 0, current: currentCustomerCount.count || 0, previous: previousCustomerCount.count || 0 }, limits: { productsTruncated: productResult.truncated, customersTruncated: customerResult.truncated }, range };
+}
+
+async function fetchKeysetRows(buildQuery, getCursor, pageSize = 500, maxRows = MAX_PAGINATED_ROWS) {
+  const rows = [];
+  let cursor = null;
+  for (;;) {
+    const { data, error } = await buildQuery(cursor);
+    if (error) throw error;
+    if (!data?.length) return { rows, truncated: false };
+    rows.push(...(data || []).slice(0, maxRows - rows.length));
+    cursor = getCursor(data[data.length - 1]);
+    if (data.length < pageSize) return { rows, truncated: false };
+    if (rows.length >= maxRows) {
+      const probe = await buildQuery(cursor);
+      if (probe.error) throw probe.error;
+      return { rows, truncated: Boolean(probe.data?.length) };
+    }
+  }
 }
 
 export function inRange(value, start, end) { return Boolean(value && value >= start && value < end); }
@@ -42,6 +63,8 @@ export function sum(values) { return values.reduce((total, value) => total + (Nu
 export function percentageChange(current, previous) { if (!Number.isFinite(previous) || previous === 0) return current > 0 ? { label: 'New', value: null, direction: 'up' } : { label: 'Not enough history', value: null, direction: 'flat' }; const value = ((current - previous) / Math.abs(previous)) * 100; return { label: `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`, value, direction: value > 0 ? 'up' : value < 0 ? 'down' : 'flat' }; }
 export function calculateMetrics(data) {
   const { products, customers, tasks, activities, customerCounts, range } = data;
+  const catalogComplete = !data.limits?.productsTruncated;
+  const customerHistoryComplete = !data.limits?.customersTruncated;
   const currentCustomers = customers.filter(item => inRange(item.created_at, range.start, range.end));
   const previousCustomers = customers.filter(item => inRange(item.created_at, range.previousStart, range.previousEnd));
   const currentTasks = tasks.filter(item => inRange(item.created_at, range.start, range.end));
@@ -49,10 +72,10 @@ export function calculateMetrics(data) {
   const currentActivities = activities.filter(item => inRange(item.created_at, range.start, range.end));
   const previousActivities = activities.filter(item => inRange(item.created_at, range.previousStart, range.previousEnd));
   const activeTasks = tasks.filter(item => item.status !== 'Completed');
-  const recordedSales = sum(products.map(item => item.sales));
-  const recordedSalesValue = sum(products.map(item => Number(item.sales || 0) * Number(item.selling_price || 0)));
+  const recordedSales = catalogComplete ? sum(products.map(item => item.sales)) : null;
+  const recordedSalesValue = catalogComplete ? sum(products.map(item => Number(item.sales || 0) * Number(item.selling_price || 0))) : null;
   const totalCustomerTotal = customerCounts?.total ?? customers.length;
   const currentCustomerTotal = customerCounts?.current ?? currentCustomers.length;
   const previousCustomerTotal = customerCounts?.previous ?? previousCustomers.length;
-  return { products, customers, tasks, activities, activeTasks, lowStock: products.filter(item => Number(item.stock) <= 5), topProducts: [...products].sort((a, b) => Number(b.sales || 0) - Number(a.sales || 0)), recordedSales, recordedSalesValue, stockUnits: sum(products.map(item => item.stock)), currentCustomers, previousCustomers, totalCustomerTotal, currentCustomerTotal, previousCustomerTotal, currentTasks, previousTasks, currentActivities, previousActivities, comparisons: { customers: percentageChange(currentCustomerTotal, previousCustomerTotal), tasks: percentageChange(currentTasks.length, previousTasks.length), activity: percentageChange(currentActivities.length, previousActivities.length) } };
+  return { products, customers, tasks, activities, activeTasks, lowStock: catalogComplete ? products.filter(item => Number(item.stock) <= 5) : [], topProducts: [...products].sort((a, b) => Number(b.sales || 0) - Number(a.sales || 0)), recordedSales, recordedSalesValue, stockUnits: catalogComplete ? sum(products.map(item => item.stock)) : null, currentCustomers, previousCustomers, totalCustomerTotal, currentCustomerTotal, previousCustomerTotal, currentTasks, previousTasks, currentActivities, previousActivities, catalogComplete, customerHistoryComplete, limits: data.limits, comparisons: { customers: percentageChange(currentCustomerTotal, previousCustomerTotal), tasks: percentageChange(currentTasks.length, previousTasks.length), activity: percentageChange(currentActivities.length, previousActivities.length) } };
 }
