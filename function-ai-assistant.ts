@@ -30,7 +30,7 @@ Deno.serve(async request => {
       supabase.from('tasks').select('title,status,priority,due_date').eq('business_id', business.id).order('created_at', { ascending: false }).limit(50),
       supabase.from('approvals').select('title,status,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30),
       supabase.from('customers').select('name,company,status,last_contact_at,notes').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(50),
-      supabase.from('products').select('name,category,selling_price,stock,sales,description').eq('business_id', business.id).order('updated_at', { ascending: false }).limit(100),
+      supabase.from('products').select('name,category,selling_price,stock,sales,description').eq('business_id', business.id).order('sales', { ascending: false }).limit(100),
       supabase.from('activities').select('actor,action,entity_type,created_at').eq('business_id', business.id).order('created_at', { ascending: false }).limit(30)
     ]);
     if ([tasks, approvals, customers, products, activities].some(result => result.error)) return json(request, { error: 'Elio could not load your workspace context.' }, 500);
