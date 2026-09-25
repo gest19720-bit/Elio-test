@@ -207,7 +207,56 @@
   .metrics-custom-range .btn{width:100%}
   .attention-row{flex-wrap:wrap}
   .attention-row .btn{margin-left:44px}
+
+  /* Header actions (buttons) keep the desktop row on tablets, but stop
+     overflowing when the title and buttons compete for width. */
+  .page-header .header-actions{flex-wrap:wrap;justify-content:flex-start}
+
+  /* ---- Scroll chaining: sheets and modals shouldn't drag the page ---- */
+  .menu-sheet,.modal{overscroll-behavior:contain}
+
+  /* ---- Toast: sit above the bottom nav instead of behind it ---- */
+  .toast{
+    bottom:calc(84px + env(safe-area-inset-bottom,0px));
+    left:16px;right:16px;
+    transform:none;
+    text-align:center;
+  }
+  @keyframes toastIn{from{opacity:0;transform:translateY(10px)}}
+
+  /* ---- iOS zooms any focused control under 16px; keep that from ----
+     ---- hijacking the viewport in tables and toolbars.            ---- */
+  .toolbar input,
+  .toolbar select,
+  body[data-page] .field input,
+  body[data-page] .field select,
+  body[data-page] .field textarea,
+  .data-table select{
+    font-size:16px;
+  }
+
+  /* ---- Touch: sticky hover states misfire after taps on mobile ---- */
+  @media (hover:hover){
+    .metric:hover{transform:none;box-shadow:var(--shadow-sm)}
+  }
 }
+
+/* A phone held in landscape is short: tighten the sheets so content and
+   the close button stay reachable. */
+@media (max-width:900px) and (max-height:520px){
+  .menu-sheet{max-height:88vh}
+  .menu-grid{gap:6px}
+  .menu-grid a{padding:10px 6px 8px}
+}
+
+/* Touch devices: the metric-tile hover lift misfires after taps because
+   the first tap triggers :hover on iOS. Disable the lift there. */
+@media (hover:none){
+  .metric:hover{transform:none;box-shadow:var(--shadow-sm)}
+}
+
+/* ---- A11y: honour non-standard user font scaling in forms ---- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 @media (max-width:560px){
   h1{font-size:26px}
@@ -260,10 +309,7 @@
   .attention-row .btn{margin-left:46px;width:auto}
   .toast{
     left:14px;right:14px;
-    transform:none;
-    text-align:center;
   }
-  @keyframes toastIn{from{opacity:0;transform:translateY(10px)}}
 }
 
 @media (prefers-reduced-motion:reduce){

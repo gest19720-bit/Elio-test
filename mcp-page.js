@@ -2,6 +2,7 @@ import { SUPABASE_URL } from './config.js';
 import { supabase } from './supabase-client.js';
 import { createMcpConnection, revokeMcpConnection } from './mcp-service.js';
 import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp, revokeOAuthGrant } from './mcp-admin-service.js';
+import { openModal } from './modal.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Never';
@@ -412,7 +413,7 @@ function clientTokenEditor(done) {
       <button class="btn btn-primary" type="submit">Create token</button>
     </form>
   </div>`;
-  document.body.append(wrap);
+  openModal(wrap);
   wrap.querySelector('[data-close]').onclick = () => wrap.remove();
   wrap.querySelector('form').onsubmit = async event => {
     event.preventDefault();
@@ -447,7 +448,7 @@ function externalEditor(done) {
       <button class="btn btn-primary" type="submit">Add and test</button>
     </form>
   </div>`;
-  document.body.append(wrap);
+  openModal(wrap);
   wrap.querySelector('[data-close]').onclick = () => wrap.remove();
   wrap.querySelector('form').onsubmit = async event => {
     event.preventDefault();
