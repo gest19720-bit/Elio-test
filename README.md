@@ -68,14 +68,26 @@ The migration enables RLS on every product table. Child records are readable and
 
 ## AI configuration
 
-Deploy the secure function from the project root:
+In this flattened checkout the Edge Functions live at the repository root as `function-ai-assistant.ts` and `function-ai-follow-up.ts` (no `supabase/functions/` directory). The Supabase CLI deploys from a `supabase/functions/<function-name>/index.ts` layout, so stage the two files before deploying:
 
 ```powershell
+# One-time: link the CLI to your Supabase project
+supabase link --project-ref <your-project-ref>
+
+# Stage the flattened function sources into the CLI layout
+New-Item -ItemType Directory -Force supabase/functions/ai-assistant, supabase/functions/ai-follow-up | Out-Null
+Copy-Item function-ai-assistant.ts supabase/functions/ai-assistant/index.ts
+Copy-Item function-ai-follow-up.ts supabase/functions/ai-follow-up/index.ts
+
+# Deploy and set server-side secrets
+supabase functions deploy ai-assistant
 supabase functions deploy ai-follow-up
 supabase secrets set OPENAI_API_KEY=your-server-side-key OPENAI_MODEL=gpt-5-mini ALLOWED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
 ```
 
-`OPENAI_API_KEY` must remain an Edge Function secret. On `localhost`, Elio automatically uses an explicitly labeled deterministic AI test service so you can validate customer, tone, follow-up, approval, execution, and activity flows before deploying the Edge Function. Deployed hosts remain real-only by default. To force a mode, set `window.ELIO_AI_MODE = 'mock'` or `'real'` before the app module loads.
+(The staging files are build artifacts; they are not part of the repo and can be deleted after deploying.)
+
+`OPENAI_API_KEY` must remain an Edge Function secret. Elio does not simulate AI responses: if either function or its server-side configuration is unavailable, the UI keeps the owner’s request intact and shows a safe retry message.
 
 ## Optional development seed
 

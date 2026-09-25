@@ -2,6 +2,7 @@ import { SUPABASE_URL } from './config.js';
 import { supabase } from './supabase-client.js';
 import { createMcpConnection, revokeMcpConnection } from './mcp-service.js';
 import { getMcpOverview, setMcpPermission, createExternalMcp, testExternalMcp, setExternalMcpEnabled, removeExternalMcp, revokeOAuthGrant } from './mcp-admin-service.js';
+import { openModal } from './modal.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const date = value => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Never';
@@ -412,12 +413,16 @@ function clientTokenEditor(done) {
       <button class="btn btn-primary" type="submit">Create token</button>
     </form>
   </div>`;
-  document.body.append(wrap);
-  wrap.querySelector('[data-close]').onclick = () => wrap.remove();
+  // openModal wires [data-close] through the lock guard: dismissal is
+  // blocked while creation is pending and while the one-time token is
+  // displayed, then re-enabled if creation fails.
+  openModal(wrap);
   wrap.querySelector('form').onsubmit = async event => {
     event.preventDefault();
     const form = event.target, button = form.querySelector('button');
     button.disabled = true;
+    // The token is shown once; disallow dismissal while it is pending or displayed.
+    wrap.dataset.locked = 'true';
     try {
       const result = await createMcpConnection({ appName: form.appName.value, scopes: form.scopes.value.split(',').map(value => value.trim()).filter(Boolean), expiresAt: null });
       wrap.innerHTML = `<div class="modal">
@@ -430,7 +435,7 @@ function clientTokenEditor(done) {
       </div>`;
       wrap.querySelector('[data-copy]').onclick = async () => { await navigator.clipboard.writeText(result.token); toast('Token copied.'); };
       wrap.querySelector('[data-done]').onclick = () => { wrap.remove(); done(); };
-    } catch (error) { button.disabled = false; toast(errorText(error)); }
+    } catch (error) { button.disabled = false; delete wrap.dataset.locked; toast(errorText(error)); }
   };
 }
 
@@ -447,7 +452,7 @@ function externalEditor(done) {
       <button class="btn btn-primary" type="submit">Add and test</button>
     </form>
   </div>`;
-  document.body.append(wrap);
+  openModal(wrap);
   wrap.querySelector('[data-close]').onclick = () => wrap.remove();
   wrap.querySelector('form').onsubmit = async event => {
     event.preventDefault();
