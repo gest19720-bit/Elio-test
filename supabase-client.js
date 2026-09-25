@@ -45,7 +45,7 @@ export function friendlyError(error, fallback = 'Something went wrong. Please tr
   const code = String(error?.code || '');
   if (/duplicate|already exists|unique/i.test(message)) return 'That record already exists.';
   if (/timed out|failed to fetch|network|could not load/i.test(message)) return 'Elio could not reach Supabase. Check your internet connection and confirm the project URL is available.';
-  if (/JWT|auth|session has expired/i.test(message)) return 'Your session has expired. Please sign in again.';
+  if (/JWT|invalid jwt|token.*expired|session has expired/i.test(message)) return 'Your session has expired. Please sign in again.';
   if (code === '42P01' || code === 'PGRST205' || /relation .* does not exist|Could not find the table/i.test(message)) return 'Elio’s product tables are not installed yet. Run 002_elio_mvp.sql in Supabase SQL Editor, then refresh.';
   if (code === 'PGRST202' || /function .*create_follow_up_workflow.*not found|Could not find the function/i.test(message)) return 'Elio’s follow-up workflow is not installed yet. Run 002_elio_mvp.sql in Supabase SQL Editor, then refresh.';
   if (code === '42703' || /column .* does not exist|schema cache/i.test(message)) return 'Elio’s database schema is out of date. Re-run 002_elio_mvp.sql in Supabase SQL Editor, then refresh.';

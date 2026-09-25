@@ -18,7 +18,8 @@ const apiHandlers = {
   '/.well-known/oauth-authorization-server': require('./oauth-authorization-server.js'),
   '/.well-known/oauth-protected-resource': require('./oauth-protected-resource.js'),
   '/mcp': require('./mcp-api.js'),
-  '/api/mcp': require('./mcp-api.js')
+  '/api/mcp': require('./mcp-api.js'),
+  '/api/composio': require('./composio-api.cjs')
 };
 
 const root = path.dirname(fileURLToPath(import.meta.url));
