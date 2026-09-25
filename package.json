@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "@composio/core": "^0.18.0",
+    "@supabase/supabase-js": "^2.57.0"
+  }
+}

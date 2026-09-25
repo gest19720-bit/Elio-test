@@ -41,6 +41,7 @@
     { "src": "oauth-register.js", "use": "@vercel/node" },
     { "src": "oauth-request-details.js", "use": "@vercel/node" },
     { "src": "mcp-api.js", "use": "@vercel/node" }
+    ,{ "src": "composio-api.cjs", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/.well-known/oauth-protected-resource", "dest": "/oauth-protected-resource.js" },
@@ -50,6 +51,7 @@
     { "src": "/oauth/register", "dest": "/oauth-register.js" },
     { "src": "/api/oauth/request-details", "dest": "/oauth-request-details.js" },
     { "src": "/mcp", "dest": "/mcp-api.js" },
+    { "src": "/api/composio", "dest": "/composio-api.cjs" },
     { "handle": "filesystem" }
   ]
 }

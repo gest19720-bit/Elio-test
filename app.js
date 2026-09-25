@@ -12,6 +12,7 @@ import { listMcpConnections, createMcpConnection, revokeMcpConnection, listMcpAc
 import { askAssistant } from './assistant-service.js';
 import { renderMcpPage } from './mcp-page.js';
 import { renderMetricsPage } from './metrics-page.js';
+import { authorizeWorkspaceApp, listWorkspaceConnections, searchWorkspaceTools } from './composio-service.js';
 import { renderMarketingPage } from './marketing-page.js';
 
 const page = document.body.dataset.page;
@@ -188,7 +189,61 @@ function mcpEditor(done) {
 async function showMcpLog(connectionId, appName) {
   const wrap = document.createElement('div'); wrap.className = 'modal-backdrop'; wrap.innerHTML = `<div class="modal"><div class="modal-header"><div><span class="eyebrow">Access log</span><h2 style="margin-top:5px">${esc(appName)}</h2></div><button class="btn btn-quiet" data-close aria-label="Close">×</button></div><div data-mcp-log>${emptyState('Loading access log…', 'Fetching recent tool requests.')}</div></div>`; document.body.append(wrap); wrap.querySelector('[data-close]').onclick = () => wrap.remove(); try { const entries = await listMcpAccessLog(connectionId); wrap.querySelector('[data-mcp-log]').innerHTML = entries.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Tool</th><th>Requested</th><th>Latency</th><th>Result</th></tr></thead><tbody>${entries.map(entry => `<tr><td><strong>${esc(entry.tool_name)}</strong></td><td>${esc(new Date(entry.requested_at).toLocaleString())}</td><td>${entry.latency_ms == null ? '—' : `${Number(entry.latency_ms)} ms`}</td><td><span class="badge ${entry.success ? 'green' : 'red'}">${entry.success ? 'Success' : 'Failed'}</span></td></tr>`).join('')}</tbody></table></div>` : emptyState('No requests recorded.', 'Tool activity will appear here after this connection is used.'); } catch (error) { wrap.querySelector('[data-mcp-log]').innerHTML = emptyState('The access log could not load.', friendlyError(error)); } }
 
-async function renderConnections(b){const providers=[['Gmail','Communication'],['Outlook','Communication'],['WhatsApp','Communication'],['Stripe','Payments'],['Paystack','Payments'],['Google Calendar','Productivity'],['Google Drive','Productivity']];document.querySelector('#app-content').innerHTML=header('Connections','Elio is transparent about what is and is not connected.')+`<div class="content-grid">${providers.map(([name,category])=>`<section class="card"><span class="eyebrow">${category}</span><h3 style="margin:8px 0">${name}</h3><p>Connect ${name} when you are ready. The integration is not available in this MVP.</p><span class="badge" style="margin-top:18px">Coming soon</span></section>`).join('')}</div>`;}
+async function renderConnections(b) {
+  const apps = [
+    { toolkit: 'gmail', name: 'Gmail', category: 'Communication', description: 'Search and summarize messages. Sending remains off until an approved workflow is added.' },
+    { toolkit: 'googlecalendar', name: 'Google Calendar', category: 'Productivity', description: 'View events and availability. Creating or changing events remains off until approved.' },
+    { toolkit: 'googlesheets', name: 'Google Sheets', category: 'Productivity', description: 'Discover spreadsheets and read data. Updates remain off until approved.' }
+  ];
+  const target = document.querySelector('#app-content');
+  const workspaceCards = apps.map(app => `<section class="card" data-workspace-app="${app.toolkit}"><span class="eyebrow">${app.category}</span><h3 style="margin:8px 0">${app.name}</h3><p data-workspace-status>Checking connection…</p><p class="muted">${app.description}</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="btn btn-primary" data-workspace-connect>Connect ${app.name}</button><button class="btn btn-quiet" data-workspace-discover disabled>Discover read-only tools</button></div><pre data-workspace-tools hidden style="white-space:pre-wrap;margin-top:18px"></pre></section>`).join('');
+  const providers = [['Outlook', 'Communication'], ['WhatsApp', 'Communication'], ['Stripe', 'Payments'], ['Paystack', 'Payments'], ['Google Drive', 'Productivity']];
+  target.innerHTML = header('Connections', 'Connect Google Workspace apps through Composio. Elio keeps app credentials server-side and starts with read-only access.', '<button class="btn btn-quiet" data-refresh-workspace>Refresh connection statuses</button>') + `<section class="card" style="margin-bottom:18px"><span class="eyebrow">Google Workspace</span><h3 style="margin:8px 0">Connect the apps your business uses</h3><p>Choose an app, connect your Google account, approve access, then return to Elio. Each app shows its own verified status.</p></section><div class="content-grid">${workspaceCards}${providers.map(([name, category]) => `<section class="card"><span class="eyebrow">${category}</span><h3 style="margin:8px 0">${name}</h3><p>Connect ${name} when you are ready.</p><span class="badge" style="margin-top:18px">Coming soon</span></section>`).join('')}</div>`;
+  const refresh = async () => {
+    try {
+      const result = await listWorkspaceConnections();
+      apps.forEach(app => {
+        const card = target.querySelector(`[data-workspace-app="${app.toolkit}"]`);
+        const connection = result.toolkits?.[app.toolkit];
+        const connected = Boolean(connection?.connection?.isActive);
+        card.querySelector('[data-workspace-status]').textContent = connected ? `Connected through Composio. Read-only ${app.name} tools are available.` : `Not connected yet. Connect ${app.name} to authorize Elio.`;
+        card.querySelector('[data-workspace-discover]').disabled = !connected;
+      });
+    } catch (error) {
+      const message = friendlyError(error, String(error?.message || 'Connection status is unavailable.'));
+      target.querySelectorAll('[data-workspace-status]').forEach(status => { status.textContent = message; });
+    }
+  };
+  target.querySelectorAll('[data-workspace-app]').forEach(card => {
+    const toolkit = card.dataset.workspaceApp;
+    const name = apps.find(app => app.toolkit === toolkit).name;
+    const connect = card.querySelector('[data-workspace-connect]');
+    const discover = card.querySelector('[data-workspace-discover]');
+    const output = card.querySelector('[data-workspace-tools]');
+    connect.onclick = async () => {
+      const authorizationTab = window.open('about:blank', '_blank');
+      if (!authorizationTab) {
+        card.querySelector('[data-workspace-status]').textContent = 'Elio could not open the authorization window. Allow popups for this site, then try again.';
+        return;
+      }
+      authorizationTab.opener = null;
+      connect.disabled = true;
+      try {
+        const result = await authorizeWorkspaceApp(toolkit);
+        authorizationTab.location.replace(result.redirectUrl);
+        card.querySelector('[data-workspace-status]').textContent = 'Authorization opened in a new tab. Return here after approving access, then refresh the page.';
+      } catch (error) {
+        authorizationTab.close();
+        card.querySelector('[data-workspace-status]').textContent = friendlyError(error, String(error?.message || 'Elio could not start authorization.'));
+      } finally {
+        connect.disabled = false;
+      }
+    };
+    discover.onclick = async () => { discover.disabled = true; output.hidden = false; output.textContent = `Discovering read-only ${name} tools…`; try { const result = await searchWorkspaceTools(toolkit, `show read-only ${name} tools`); output.textContent = JSON.stringify(result.result, null, 2); } catch (error) { output.textContent = friendlyError(error, 'Tool discovery failed.'); } finally { discover.disabled = false; } };
+  });
+  target.querySelector('[data-refresh-workspace]').onclick = refresh;
+  await refresh();
+}
 
 /* ====================================================================
    ASK ELIO — AI assistant page
