@@ -449,6 +449,22 @@ body[data-page] .field textarea::placeholder{color:var(--text-tertiary)}
 }
 .modal-header p{margin-top:5px;font-size:13px}
 .modal form .btn-primary{margin-top:6px;width:100%}
+.follow-up-modal{max-width:620px}
+.follow-up-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.follow-up-message-field{margin-top:4px}
+.follow-up-composer-label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}
+.follow-up-composer-label label{margin:0!important}
+.follow-up-generate{padding:6px 9px!important;font-size:12px!important;color:var(--elio-blue)!important;white-space:nowrap}
+.follow-up-generate span:first-child{color:var(--elio-amber);font-size:15px}
+.follow-up-message-field textarea{min-height:150px;resize:vertical;line-height:1.55}
+.follow-up-placement{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding:10px 12px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary)}
+.follow-up-placement .header-actions{flex-shrink:0}
+.follow-up-placement .btn{padding:6px 9px;font-size:12px}
+.follow-up-submit-actions{margin-top:6px}
+.follow-up-submit-actions .btn{width:100%}
+.follow-up-disclaimer{margin-top:12px;font-size:12px}
+[data-draft-status]{margin-top:8px;font-size:12px;color:var(--success)}
+[data-ai-error]{margin-top:10px;color:var(--danger)}
 @keyframes fadeIn{from{opacity:0}}
 @keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.98)}}
 

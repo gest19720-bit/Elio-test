@@ -47,6 +47,8 @@ Then run `003_crm_leads.sql` to enable the Lead status and lead-source field for
 
 Then run `004_products.sql` to create the business-scoped product catalog, stock, pricing, sales fields, and RLS policy.
 
+Before deploying `book-demo.html`, run `010_book_demo.sql` in the Supabase Dashboard → SQL Editor. It creates the private `demo_requests` table, its RLS/privilege boundary, and the `request_demo(...)` RPC used by the public booking form. The landing-page demo links are not production-ready until this migration has been applied.
+
 From **PowerShell** at the project root, deploy the secure AI function:
 
 ```powershell
