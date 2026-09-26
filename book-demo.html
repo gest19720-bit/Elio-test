@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Book a demo — Elio</title>
+<meta name="description" content="Book a 30-minute walkthrough of Elio, the AI back office for small businesses. Tell us about your team and pick a time that suits you." />
+<link rel="icon" type="image/jpeg" href="elio-logo.jpeg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+  /* =========================================================
+     ELIO — BOOK A DEMO
+     Same design language as the landing, waitlist, and contact
+     pages. Functional class names (form-step, option-card,
+     has-error…) are preserved — they are wired to the flow logic.
+     ========================================================= */
+  :root{
+    --paper:        #fbfaf6;
+    --paper-dim:    #f2f0e8;
+    --ink:          #12181f;
+    --ink-soft:     #5c6570;
+    --ink-faint:    #97a0a8;
+    --line:         #e6e2d5;
+
+    --deep:         #0b0f16;
+    --line-dark:    rgba(255,255,255,.09);
+    --white:        #ffffff;
+    --white-dim:    rgba(255,255,255,.68);
+    --white-faint:  rgba(255,255,255,.42);
+
+    --blue:         #3157e8;
+    --blue-hover:   #2747c9;
+    --blue-light:   #ecf0fe;
+    --blue-dim:     rgba(49,87,232,.12);
+    --amber:        #e7b055;
+    --amber-deep:   #b97f24;
+    --success:      #2f9e6a;
+    --success-light:#e7f6ee;
+    --danger:       #d24a35;
+    --danger-light: #fdeeec;
+
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+    --sans-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    --radius-sm:   11px;
+    --radius-md:   14px;
+    --radius-lg:   20px;
+    --radius-xl:   26px;
+    --pill:        999px;
+
+    --shadow-btn:  0 10px 22px rgba(49,87,232,.22);
+    --shadow-md:   0 10px 30px rgba(15,23,42,.08);
+    --shadow-lg:   0 24px 60px rgba(15,23,42,.16);
+    --speed: .18s;
+    --ease: ease;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:var(--sans-display); color:var(--ink); margin:0; letter-spacing:-.015em; line-height:1.18;}
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  .container{max-width:1180px; margin:0 auto; padding:0 32px;}
+  .serif-accent{font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:0;}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--blue); outline-offset:3px; border-radius:4px;
+  }
+
+  /* ---- Shared pieces ---- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--blue);
+  }
+  .eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:currentColor;
+    box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  }
+  .eyebrow.on-dark{color:var(--amber);}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:var(--pill);
+    background:var(--paper-dim); color:var(--ink-soft); border:1px solid var(--line);
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    padding:13px 24px; border-radius:var(--pill);
+    font-weight:700; font-size:.94rem; border:1px solid transparent;
+    background:none;
+    transition:transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease), background var(--speed) var(--ease), border-color var(--speed) var(--ease), color var(--speed) var(--ease), opacity var(--speed) var(--ease);
+  }
+  .btn-primary{background:var(--blue); color:#fff; box-shadow:var(--shadow-btn);}
+  .btn-primary:hover{background:var(--blue-hover); transform:translateY(-2px); box-shadow:0 16px 32px rgba(49,87,232,.3);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-primary:disabled{opacity:.55; cursor:not-allowed; transform:none;}
+  .btn-quiet{border-color:var(--line); color:var(--ink-soft);}
+  .btn-quiet:hover{border-color:var(--ink-faint); color:var(--ink);}
+  .text-link{
+    font-size:.92rem; font-weight:600; color:var(--ink-soft);
+    border-bottom:1px solid transparent; padding-bottom:1px;
+    transition:color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+  }
+  .text-link:hover{color:var(--ink); border-color:var(--ink);}
+  .text-link.on-dark{color:var(--white-dim); border-bottom-color:rgba(255,255,255,.25);}
+  .text-link.on-dark:hover{color:#fff; border-color:#fff;}
+
+  /* ============ Nav ============ */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(11,15,22,.86);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-dark);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:15px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; color:var(--white);}
+  .brand-mark{width:32px; height:32px; border-radius:9px; object-fit:cover;}
+  .brand-word{font-family:var(--sans-display); font-weight:800; font-size:1.1rem; letter-spacing:-.02em;}
+  .nav-links{display:flex; gap:30px;}
+  .nav-links a{color:var(--white-dim); font-size:.88rem; font-weight:500; transition:color var(--speed) var(--ease);}
+  .nav-links a:hover{color:#fff;}
+  .nav-links a[aria-current="page"]{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:18px;}
+  .nav-actions .btn{padding:10px 19px; font-size:.86rem;}
+  .nav-toggle{display:none; background:none; border:none; width:34px; height:26px; position:relative;}
+  .nav-toggle span{position:absolute; left:4px; right:4px; height:2px; background:#fff; border-radius:2px;}
+  .nav-toggle span:nth-child(1){top:4px;} .nav-toggle span:nth-child(2){top:12px;} .nav-toggle span:nth-child(3){top:20px;}
+  .mobile-menu{
+    display:none; background:var(--deep); border-bottom:1px solid var(--line-dark);
+    padding:6px 32px 24px; flex-direction:column; gap:14px;
+  }
+  .mobile-menu a{color:var(--white-dim); font-weight:500; padding:4px 0;}
+  .mobile-menu .btn{margin-top:8px;}
+
+  /* ============ Page shell ============ */
+  .demo-main{padding:72px 0 110px;}
+  .demo-grid{
+    display:grid; grid-template-columns:.85fr 1.15fr; gap:72px; align-items:start;
+  }
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.84rem; color:var(--ink-soft); margin-bottom:36px;
+    transition:color var(--speed) var(--ease);
+  }
+  .back-link:hover{color:var(--ink);}
+
+  /* ---- Intro column ---- */
+  .demo-intro h1{
+    font-size:clamp(2rem, 3.2vw, 2.6rem);
+    line-height:1.14; letter-spacing:-.025em;
+    max-width:14ch;
+  }
+  .demo-intro h1 .serif-accent{color:var(--amber-deep);}
+  .demo-intro .intro-lede{
+    margin-top:18px; color:var(--ink-soft); font-size:1.04rem; max-width:42ch;
+  }
+  .demo-promises{margin-top:44px;}
+  .promise-row{
+    display:grid; grid-template-columns:120px 1fr;
+    gap:18px; padding:22px 0; border-top:1px solid var(--line); align-items:baseline;
+  }
+  .demo-promises .promise-row:last-child{border-bottom:1px solid var(--line);}
+  .promise-tag{
+    font-family:var(--sans-display); font-size:.8rem; color:var(--blue);
+    font-weight:700; letter-spacing:.02em;
+  }
+  .promise-row p{color:var(--ink-soft); font-size:.92rem; max-width:36ch;}
+  .privacy-note{
+    margin-top:30px; font-size:.82rem; color:var(--ink-soft);
+    padding:12px 16px; border-left:2px solid var(--blue);
+    background:var(--blue-light); border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+    max-width:42ch;
+  }
+
+  /* ============ Form card ============ */
+  .form-card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius-xl);
+    padding:40px 44px 36px;
+    box-shadow:var(--shadow-lg);
+    position:relative;
+  }
+  .form-intro{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:26px;
+  }
+  .form-kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.78rem; font-weight:700; color:var(--blue);
+  }
+  .form-kicker::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:currentColor;
+    box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+  }
+  .form-time{font-size:.78rem; color:var(--ink-faint);}
+
+  .progress-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:var(--sans-display); font-size:.82rem; font-weight:700; color:var(--ink);
+    margin-bottom:10px;
+  }
+  .progress-label span:last-child{color:var(--ink-faint); font-family:var(--sans); font-weight:500;}
+  .progress-track{height:4px; background:var(--paper-dim); border-radius:var(--pill); position:relative; overflow:hidden;}
+  .progress-fill{
+    position:absolute; left:0; top:0; height:100%; background:var(--blue);
+    border-radius:var(--pill); width:16%; transition:width .35s var(--ease);
+  }
+
+  form{margin-top:32px;}
+  .form-step{display:none;}
+  .form-step.is-active{display:block; animation:step-in .28s var(--ease);}
+  @keyframes step-in{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .form-step h2{font-size:1.3rem; letter-spacing:-.02em;}
+  .step-subtitle{margin-top:8px; color:var(--ink-soft); font-size:.92rem;}
+  .step-subtitle span{color:var(--ink-faint);}
+
+  .form-field{margin-top:22px;}
+  .form-field label{
+    display:block; font-size:.8rem; font-weight:700; color:var(--ink); margin-bottom:8px;
+  }
+  .form-field input, .form-field textarea, .form-field select{
+    width:100%; font-family:var(--sans); font-size:.94rem; color:var(--ink);
+    padding:13px 14px; border:1px solid var(--line); border-radius:var(--radius-sm);
+    background:var(--paper); outline:none;
+    transition:border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
+  }
+  .form-field input::placeholder, .form-field textarea::placeholder{color:var(--ink-faint);}
+  .form-field input:focus, .form-field textarea:focus, .form-field select:focus{
+    border-color:var(--blue); box-shadow:0 0 0 4px var(--blue-dim);
+  }
+  .form-field textarea{min-height:110px; resize:vertical;}
+  .form-field.has-error input, .form-field.has-error textarea, .form-field.has-error select{border-color:var(--danger);}
+  .field-error{display:none; margin-top:6px; font-size:.78rem; color:var(--danger);}
+  .form-field.has-error .field-error{display:block;}
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap;
+  }
+  .optional-tag{font-weight:500; color:var(--ink-faint);}
+
+  .field-group-label{
+    display:block; font-size:.8rem; font-weight:700; color:var(--ink);
+    margin:26px 0 12px;
+  }
+  .form-field:first-child, .field-group-label:first-child{margin-top:0;}
+
+  .option-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;
+  }
+  .option-grid-small{grid-template-columns:repeat(3, 1fr);}
+  .option-card{
+    padding:13px 14px; font-size:.9rem; color:var(--ink); text-align:left;
+    border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--paper);
+    transition:border-color var(--speed) var(--ease), background var(--speed) var(--ease), color var(--speed) var(--ease), transform var(--speed) var(--ease);
+  }
+  .option-card:hover{border-color:var(--blue); transform:translateY(-1px);}
+  .option-card.is-selected{
+    border-color:var(--blue); background:var(--blue-light); color:var(--blue);
+    box-shadow:inset 0 0 0 1px var(--blue);
+  }
+
+  .step-actions{
+    display:flex; justify-content:space-between; align-items:center; margin-top:34px; gap:12px;
+  }
+  .step-actions.single{justify-content:flex-end;}
+
+  .spinner{
+    display:none; width:15px; height:15px; border-radius:50%;
+    border:2px solid rgba(255,255,255,.4); border-top-color:#fff;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  button[data-action="submit"].is-loading .spinner{display:inline-block;}
+  button[data-action="submit"].is-loading .btn-label{opacity:.85;}
+
+  .form-message{
+    margin-top:18px; font-size:.86rem; padding:12px 14px; border-radius:var(--radius-md);
+    display:none;
+  }
+  .form-message.is-visible{display:block;}
+  .form-message.is-error{background:var(--danger-light); color:var(--danger);}
+  .form-message.is-info{background:var(--blue-light); color:var(--blue);}
+
+  /* ---- Review recap on the scheduling step ---- */
+  .review-box{
+    margin-top:26px; border:1px solid var(--line); border-radius:var(--radius-md);
+    background:var(--paper); overflow:hidden;
+  }
+  .review-box h3{
+    font-size:.78rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); padding:12px 16px; border-bottom:1px solid var(--line);
+    background:var(--paper-dim);
+  }
+  .review-rows{display:grid;}
+  .review-row{
+    display:grid; grid-template-columns:150px 1fr; gap:12px;
+    padding:10px 16px; border-bottom:1px solid var(--line);
+    font-size:.84rem;
+  }
+  .review-row:last-child{border-bottom:0;}
+  .review-row dt{color:var(--ink-faint); font-weight:600;}
+  .review-row dd{margin:0; color:var(--ink); font-weight:600; overflow-wrap:anywhere;}
+
+  /* ---- Confirmation panel ---- */
+  .demo-confirmation{display:none; text-align:center; padding:12px 0 4px;}
+  .demo-confirmation.is-visible{display:block; animation:step-in .3s var(--ease);}
+  .confirmation-icon{
+    width:58px; height:58px; margin:0 auto;
+    display:grid; place-items:center; border-radius:50%;
+    background:var(--success-light); color:var(--success);
+    font-size:1.6rem; font-weight:800;
+  }
+  .demo-confirmation h2{margin-top:20px; font-size:1.5rem;}
+  .demo-confirmation .confirmation-lede{margin-top:10px; color:var(--ink-soft); font-size:.96rem; max-width:44ch; margin-left:auto; margin-right:auto;}
+  .confirmation-reference{
+    display:inline-flex; align-items:center; gap:8px; margin-top:18px;
+    background:var(--paper-dim); border:1px dashed var(--ink-faint);
+    border-radius:var(--radius-sm); padding:8px 14px;
+    font-size:.84rem; color:var(--ink-soft);
+  }
+  .confirmation-reference strong{font-family:var(--sans-display); letter-spacing:.06em; color:var(--ink);}
+  .confirmation-next{
+    text-align:left; margin:28px auto 0; max-width:420px;
+    border-top:1px solid var(--line); padding-top:8px;
+  }
+  .confirmation-next > div{
+    display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start;
+    padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .confirmation-next .step-num{
+    width:26px; height:26px; border-radius:8px; margin-top:2px;
+    display:grid; place-items:center;
+    background:var(--blue-light); color:var(--blue);
+    font-family:var(--sans-display); font-size:.72rem; font-weight:800;
+  }
+  .confirmation-next strong{display:block; font-family:var(--sans-display); font-size:.92rem;}
+  .confirmation-next p{color:var(--ink-soft); font-size:.84rem; margin-top:2px;}
+  .confirmation-actions{display:flex; justify-content:center; gap:14px; margin-top:30px; flex-wrap:wrap;}
+
+  /* ============ Footer ============ */
+  .site-footer{background:var(--deep); border-top:1px solid var(--line-dark); color:var(--white-faint); padding:42px 0;}
+  .footer-inner{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .footer-inner .brand{color:#fff;}
+  .footer-inner .brand .brand-word{font-size:1rem;}
+  .footer-tag{font-size:.8rem; margin-top:10px; color:var(--white-faint);}
+  .footer-links{display:flex; gap:22px; font-size:.84rem; padding-top:6px;}
+  .footer-links a{color:var(--white-dim); transition:color var(--speed) var(--ease);}
+  .footer-links a:hover{color:#fff;}
+
+  /* ============ Responsive ============ */
+  @media (max-width: 980px){
+    .demo-grid{grid-template-columns:1fr; gap:48px;}
+    .demo-intro{max-width:56ch;}
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+    .nav-actions .text-link{display:none;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    .demo-main{padding:48px 0 76px;}
+    .form-card{padding:28px 20px 26px;}
+    .option-grid{grid-template-columns:1fr;}
+    .option-grid-small{grid-template-columns:repeat(2, 1fr);}
+    .promise-row{grid-template-columns:1fr; gap:4px;}
+    .step-actions{flex-wrap:wrap;}
+    .step-actions .btn{flex:1;}
+    .review-row{grid-template-columns:1fr; gap:2px;}
+    .footer-inner{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="brand" aria-label="Elio home">
+        <img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" />
+        <span class="brand-word">elio</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#product">Product</a>
+        <a href="index.html#control">How it works</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="book-demo.html" aria-current="page">Book a demo</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-primary">Back to home</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="index.html#product">Product</a>
+      <a href="index.html#control">How it works</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="book-demo.html">Book a demo</a>
+      <a href="index.html" class="btn btn-primary btn-block">Back to home</a>
+    </nav>
+  </header>
+
+  <main class="demo-main">
+    <div class="container demo-grid">
+
+      <aside class="demo-intro">
+        <a class="back-link" href="index.html">← Back to Elio</a>
+        <h1>See Elio run your <span class="serif-accent">back office.</span></h1>
+        <p class="intro-lede">Thirty minutes with the founding team. We'll walk through Elio on your kind of work — your customers, your follow-ups, your approvals — and answer everything live.</p>
+
+        <div class="demo-promises">
+          <div class="promise-row">
+            <div class="promise-tag">Tailored</div>
+            <p>Tell us what you want to see below, and we'll build the walkthrough around it.</p>
+          </div>
+          <div class="promise-row">
+            <div class="promise-tag">Hands-on</div>
+            <p>No slideware. You'll see the real product, on real workflows, end to end.</p>
+          </div>
+          <div class="promise-row">
+            <div class="promise-tag">Straight answers</div>
+            <p>Pricing, security, and data handling — covered on the call, not after it.</p>
+          </div>
+        </div>
+
+        <p class="privacy-note">Your answers stay private and are used only to prepare your demo — never sold or shared.</p>
+      </aside>
+
+      <section class="form-card">
+        <div class="form-intro">
+          <span class="form-kicker">Book a demo</span>
+          <span class="form-time">Takes about 2 minutes</span>
+        </div>
+
+        <div class="progress-label">
+          <span id="progress-label">Step 1 of 6</span>
+          <span id="progress-percent">17%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <form id="demo-form" novalidate>
+
+          <!-- Step 1 — About you -->
+          <div class="form-step is-active" data-step="1">
+            <h2>First, a little about you.</h2>
+            <p class="step-subtitle">So we know who we're meeting.</p>
+            <div class="form-field">
+              <label for="full-name">Full name</label>
+              <input type="text" id="full-name" name="fullName" placeholder="Alex Morgan" autocomplete="name" required />
+              <span class="field-error">Please enter your full name.</span>
+            </div>
+            <div class="form-field">
+              <label for="email">Work email</label>
+              <input type="email" id="email" name="email" placeholder="alex@yourbusiness.com" autocomplete="email" required />
+              <span class="field-error">Please enter a valid email address.</span>
+            </div>
+            <div class="form-field">
+              <label for="phone">Phone number <span class="optional-tag">(optional)</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="+1 555 000 1234" autocomplete="tel" />
+              <span class="field-error">That phone number doesn't look right.</span>
+            </div>
+            <div class="step-actions single">
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <!-- Step 2 — Company -->
+          <div class="form-step" data-step="2">
+            <h2>Tell us about your company.</h2>
+            <p class="step-subtitle">There's no wrong answer.</p>
+            <div class="form-field">
+              <label for="company-name">Company name</label>
+              <input type="text" id="company-name" name="companyName" placeholder="Your business" autocomplete="organization" required />
+              <span class="field-error">Please enter your company name.</span>
+            </div>
+            <div class="form-field">
+              <label for="company-website">Company website <span class="optional-tag">(optional)</span></label>
+              <input type="text" id="company-website" name="companyWebsite" placeholder="yourbusiness.com" autocomplete="url" />
+              <span class="field-error">That website doesn't look right — try something like yourbusiness.com.</span>
+            </div>
+            <span class="field-group-label">What kind of business do you run?</span>
+            <div class="option-grid" data-field="industry">
+              <button type="button" class="option-card" data-value="Agency">Agency</button>
+              <button type="button" class="option-card" data-value="Consulting">Consulting</button>
+              <button type="button" class="option-card" data-value="Freelance">Freelance</button>
+              <button type="button" class="option-card" data-value="Retail / E-commerce">Retail / E-commerce</button>
+              <button type="button" class="option-card" data-value="Service Business">Service business</button>
+              <button type="button" class="option-card" data-value="Other">Other</button>
+            </div>
+            <span class="field-error" data-group-error="industry">Please choose an industry.</span>
+            <span class="field-group-label">How big is your team?</span>
+            <div class="option-grid option-grid-small" data-field="companySize">
+              <button type="button" class="option-card" data-value="Just me">Just me</button>
+              <button type="button" class="option-card" data-value="2-10">2–10</button>
+              <button type="button" class="option-card" data-value="11-50">11–50</button>
+              <button type="button" class="option-card" data-value="51-200">51–200</button>
+              <button type="button" class="option-card" data-value="200+">200+</button>
+              <button type="button" class="option-card" data-value="Not sure yet">Not sure yet</button>
+            </div>
+            <span class="field-error" data-group-error="companySize">Please choose a team size.</span>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <!-- Step 3 — Role -->
+          <div class="form-step" data-step="3">
+            <h2>What's your role there?</h2>
+            <p class="step-subtitle">This helps us bring the right person to the call.</p>
+            <div class="option-grid" data-field="role">
+              <button type="button" class="option-card" data-value="Founder / CEO">Founder / CEO</button>
+              <button type="button" class="option-card" data-value="Operations">Operations</button>
+              <button type="button" class="option-card" data-value="Sales / BD">Sales / BD</button>
+              <button type="button" class="option-card" data-value="Marketing">Marketing</button>
+              <button type="button" class="option-card" data-value="Finance / Admin">Finance / Admin</button>
+              <button type="button" class="option-card" data-value="Other">Other</button>
+            </div>
+            <span class="field-error" data-group-error="role">Please choose your role.</span>
+            <div class="form-field">
+              <label for="heard-about">How did you hear about Elio? <span class="optional-tag">(optional)</span></label>
+              <select id="heard-about" name="heardAbout">
+                <option value="">Choose one…</option>
+                <option value="Search">Search</option>
+                <option value="Social media">Social media</option>
+                <option value="Referral">Referral from someone</option>
+                <option value="Event / community">Event or community</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <!-- Step 4 — Current stack -->
+          <div class="form-step" data-step="4">
+            <h2>What does your back office look like today?</h2>
+            <p class="step-subtitle">Select all that apply — this helps us prioritize integrations.</p>
+            <span class="field-group-label">What's already in your toolkit?</span>
+            <div class="option-grid" data-field="currentTools" data-multi="true">
+              <button type="button" class="option-card" data-value="Gmail">Gmail</button>
+              <button type="button" class="option-card" data-value="Outlook">Outlook</button>
+              <button type="button" class="option-card" data-value="WhatsApp">WhatsApp</button>
+              <button type="button" class="option-card" data-value="Google Calendar">Google Calendar</button>
+              <button type="button" class="option-card" data-value="Stripe">Stripe</button>
+              <button type="button" class="option-card" data-value="Paystack">Paystack</button>
+              <button type="button" class="option-card" data-value="QuickBooks">QuickBooks</button>
+              <button type="button" class="option-card" data-value="Excel">Excel</button>
+              <button type="button" class="option-card" data-value="Other">Something else</button>
+            </div>
+            <span class="field-group-label">What steals the most time right now?</span>
+            <div class="option-grid" data-field="challenges" data-multi="true">
+              <button type="button" class="option-card" data-value="Chasing Payments">Chasing payments</button>
+              <button type="button" class="option-card" data-value="Customer Follow-Ups">Customer follow-ups</button>
+              <button type="button" class="option-card" data-value="Scheduling">Scheduling</button>
+              <button type="button" class="option-card" data-value="Managing Invoices">Managing invoices</button>
+              <button type="button" class="option-card" data-value="Managing Emails">Managing email</button>
+              <button type="button" class="option-card" data-value="General Admin">General admin</button>
+            </div>
+            <span class="field-error" data-group-error="challenges">Please select at least one challenge.</span>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Continue</button>
+            </div>
+          </div>
+
+          <!-- Step 5 — Demo focus -->
+          <div class="form-step" data-step="5">
+            <h2>What should the demo focus on?</h2>
+            <p class="step-subtitle">We'll shape the walkthrough around what you pick. <span>(Choose as many as you like.)</span></p>
+            <div class="option-grid" data-field="demoFocus" data-multi="true">
+              <button type="button" class="option-card" data-value="Daily Brief">The daily brief</button>
+              <button type="button" class="option-card" data-value="Customer Follow-Ups">Customer follow-ups</button>
+              <button type="button" class="option-card" data-value="Approvals & Control">Approvals &amp; control</button>
+              <button type="button" class="option-card" data-value="Metrics & Insights">Metrics &amp; insights</button>
+              <button type="button" class="option-card" data-value="MCP & Integrations">MCP &amp; integrations</button>
+              <button type="button" class="option-card" data-value="Security & Data">Security &amp; data handling</button>
+            </div>
+            <span class="field-error" data-group-error="demoFocus">Please select at least one focus area.</span>
+            <div class="form-field">
+              <label for="notes">Anything specific you'd like us to cover? <span class="optional-tag">(optional)</span></label>
+              <textarea id="notes" name="notes" placeholder="We run a 6-person agency and spend hours every week chasing invoices…"></textarea>
+              <span class="field-error">That's a little long — please keep it under 2,000 characters.</span>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="button" class="btn btn-primary" data-action="next">Pick a time</button>
+            </div>
+          </div>
+
+          <!-- Step 6 — Schedule & review -->
+          <div class="form-step" data-step="6">
+            <h2>Pick a time that suits you.</h2>
+            <p class="step-subtitle">We'll confirm by email within one business day.</p>
+            <div class="form-field">
+              <label for="preferred-date">Preferred date</label>
+              <input type="date" id="preferred-date" name="preferredDate" required />
+              <span class="field-error">Please choose a date from tomorrow onward.</span>
+            </div>
+            <div class="form-field">
+              <label for="preferred-time">Preferred time</label>
+              <select id="preferred-time" name="preferredTime" required>
+                <option value="">Choose a slot…</option>
+                <option value="09:00 - 10:00">09:00 – 10:00</option>
+                <option value="10:00 - 11:00">10:00 – 11:00</option>
+                <option value="11:00 - 12:00">11:00 – 12:00</option>
+                <option value="13:00 - 14:00">13:00 – 14:00</option>
+                <option value="14:00 - 15:00">14:00 – 15:00</option>
+                <option value="15:00 - 16:00">15:00 – 16:00</option>
+                <option value="16:00 - 17:00">16:00 – 17:00</option>
+              </select>
+              <span class="field-error">Please choose a time slot.</span>
+            </div>
+            <div class="form-field">
+              <label for="timezone">Your timezone</label>
+              <select id="timezone" name="timezone" required>
+                <option value="">Detecting…</option>
+              </select>
+              <span class="field-error">Please choose your timezone.</span>
+            </div>
+            <span class="field-group-label">How would you like to meet?</span>
+            <div class="option-grid option-grid-small" data-field="meetingFormat">
+              <button type="button" class="option-card" data-value="Google Meet">Google Meet</button>
+              <button type="button" class="option-card" data-value="Zoom">Zoom</button>
+              <button type="button" class="option-card" data-value="Phone call">Phone call</button>
+            </div>
+            <span class="field-error" data-group-error="meetingFormat">Please choose a meeting format.</span>
+
+            <div class="review-box" aria-label="Review your answers">
+              <h3>Review your details</h3>
+              <dl class="review-rows" id="review-rows"></dl>
+            </div>
+
+            <div id="form-message" class="form-message"></div>
+            <div class="step-actions">
+              <button type="button" class="btn btn-quiet" data-action="back">← Back</button>
+              <button type="submit" class="btn btn-primary" data-action="submit">
+                <span class="spinner" aria-hidden="true"></span>
+                <span class="btn-label">Request my demo</span>
+              </button>
+            </div>
+            <p class="step-subtitle" style="margin-top:16px"><span>Submitting asks for the slot — it's confirmed once you receive our email invite.</span></p>
+          </div>
+
+        </form>
+
+        <!-- Confirmation — replaces the form after a successful request -->
+        <div class="demo-confirmation" id="demo-confirmation" role="status" aria-live="polite">
+          <div class="confirmation-icon" aria-hidden="true">✓</div>
+          <h2>Request received.</h2>
+          <p class="confirmation-lede" id="confirmation-lede">We've got your preferred slot and will confirm by email within one business day.</p>
+          <div class="confirmation-reference">Reference <strong id="confirmation-reference">—</strong></div>
+          <div class="confirmation-next">
+            <div>
+              <span class="step-num">1</span>
+              <div>
+                <strong>Calendar invite</strong>
+                <p>We confirm the exact slot and send a calendar invite to your work email.</p>
+              </div>
+            </div>
+            <div>
+              <span class="step-num">2</span>
+              <div>
+                <strong>Prep note</strong>
+                <p>You'll get a short agenda built around the focus areas you picked.</p>
+              </div>
+            </div>
+            <div>
+              <span class="step-num">3</span>
+              <div>
+                <strong>The walkthrough</strong>
+                <p>30 minutes with the founding team — bring your questions and your toolkit list.</p>
+              </div>
+            </div>
+          </div>
+          <div class="confirmation-actions">
+            <a href="index.html" class="btn btn-primary">Back to Elio</a>
+            <a href="signup.html" class="btn btn-quiet">Try the MVP instead</a>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a href="index.html" class="brand"><img src="elio-logo.jpeg" alt="Elio logo" class="brand-mark" /><span class="brand-word">elio</span></a>
+        <p class="footer-tag">Less busywork. More business. © 2026 Elio.</p>
+      </div>
+      <div class="footer-links">
+        <a href="book-demo.html">Book a demo</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Keep this page functional when only book-demo.html is uploaded.
+    // This is the public anon key, never a service_role key.
+    window.__ELIO_SUPABASE_CONFIG = {
+      url: 'https://rdwiokoapwzybgndwodg.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkd2lva29hcHd6eWJnbmR3b2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2OTA4MzAsImV4cCI6MjEwNDI2NjgzMH0.WfG6oxN5Q7FotzWhgETenrDeANpKnjUTw4MrRYgVVfA'
+    };
+  </script>
+  <script src="supabase.js"></script>
+  <script>
+    // Fallback for hosts that deploy only this HTML file and omit sibling assets.
+    if (!window.getElioClient && window.supabase && window.__ELIO_SUPABASE_CONFIG) {
+      window.getElioClient = function () {
+        if (!window.__elioSupabaseClient) {
+          window.__elioSupabaseClient = window.supabase.createClient(
+            window.__ELIO_SUPABASE_CONFIG.url,
+            window.__ELIO_SUPABASE_CONFIG.anonKey,
+            { auth: { persistSession: false, autoRefreshToken: false } }
+          );
+        }
+        return window.__elioSupabaseClient;
+      };
+    }
+  </script>
+  <!-- ---- DEMO FLOW SCRIPT START ---- -->
+  <script>
+    // ---- Mobile nav toggle (matches index.html) ----
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.style.display === 'flex';
+      mobileMenu.style.display = isOpen ? 'none' : 'flex';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    // ---- Book-a-demo onboarding flow ----
+    (function () {
+      const TOTAL_STEPS = 6;
+      const form = document.getElementById('demo-form');
+      const steps = Array.from(form.querySelectorAll('.form-step'));
+      const progressFill = document.getElementById('progress-fill');
+      const progressLabel = document.getElementById('progress-label');
+      const progressPercent = document.getElementById('progress-percent');
+      const formMessage = document.getElementById('form-message');
+      const reviewRows = document.getElementById('review-rows');
+      const confirmation = document.getElementById('demo-confirmation');
+
+      let currentStep = 1;
+
+      // Every answer, kept as the visitor moves through the flow.
+      const answers = {
+        fullName: '', email: '', phone: '',
+        companyName: '', companyWebsite: '', industry: '', companySize: '',
+        role: '', heardAbout: '',
+        currentTools: [], challenges: [],
+        demoFocus: [], notes: '',
+        preferredDate: '', preferredTime: '', timezone: '', meetingFormat: ''
+      };
+
+      // ---- Step navigation ----
+      function showStep(stepNumber) {
+        steps.forEach(step => {
+          step.classList.toggle('is-active', Number(step.dataset.step) === stepNumber);
+        });
+        const pct = Math.round((stepNumber / TOTAL_STEPS) * 100);
+        progressFill.style.width = pct + '%';
+        progressLabel.textContent = 'Step ' + stepNumber + ' of ' + TOTAL_STEPS;
+        progressPercent.textContent = pct + '%';
+        currentStep = stepNumber;
+        if (stepNumber === TOTAL_STEPS) renderReview();
+        const formCard = document.querySelector('.form-card');
+        if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // ---- Field helpers ----
+      function setFieldError(input, hasError) {
+        const field = input.closest('.form-field');
+        if (field) field.classList.toggle('has-error', hasError);
+      }
+
+      function clearGroupError(name) {
+        const el = form.querySelector('[data-group-error="' + name + '"]');
+        if (el) el.style.display = 'none';
+      }
+
+      function showGroupError(name) {
+        const el = form.querySelector('[data-group-error="' + name + '"]');
+        if (el) el.style.display = 'block';
+      }
+
+      function showMessage(text, type) {
+        formMessage.textContent = text;
+        formMessage.className = 'form-message is-visible is-' + type;
+      }
+
+      function clearMessage() {
+        formMessage.className = 'form-message';
+        formMessage.textContent = '';
+      }
+
+      function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      }
+
+      function isValidPhone(value) {
+        return /^[+()\-.\s\d]{7,20}$/.test(value);
+      }
+
+      function isValidWebsite(value) {
+        return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(value);
+      }
+
+      // ---- Validation, one step at a time ----
+      function validateStep(stepNumber) {
+        let valid = true;
+
+        if (stepNumber === 1) {
+          const nameInput = document.getElementById('full-name');
+          const emailInput = document.getElementById('email');
+          const phoneInput = document.getElementById('phone');
+
+          const nameOk = nameInput.value.trim().length > 1;
+          const emailOk = isValidEmail(emailInput.value.trim());
+          const phoneValue = phoneInput.value.trim();
+          const phoneOk = phoneValue === '' || isValidPhone(phoneValue);
+
+          setFieldError(nameInput, !nameOk);
+          setFieldError(emailInput, !emailOk);
+          setFieldError(phoneInput, !phoneOk);
+
+          if (nameOk) answers.fullName = nameInput.value.trim();
+          if (emailOk) answers.email = emailInput.value.trim().toLowerCase();
+          if (phoneOk) answers.phone = phoneValue;
+
+          valid = nameOk && emailOk && phoneOk;
+        }
+
+        if (stepNumber === 2) {
+          const nameInput = document.getElementById('company-name');
+          const websiteInput = document.getElementById('company-website');
+
+          const nameOk = nameInput.value.trim().length > 0;
+          const websiteValue = websiteInput.value.trim();
+          const websiteOk = websiteValue === '' || isValidWebsite(websiteValue);
+          const industryOk = Boolean(answers.industry);
+          const sizeOk = Boolean(answers.companySize);
+
+          setFieldError(nameInput, !nameOk);
+          setFieldError(websiteInput, !websiteOk);
+          if (!industryOk) showGroupError('industry'); else clearGroupError('industry');
+          if (!sizeOk) showGroupError('companySize'); else clearGroupError('companySize');
+
+          if (nameOk) answers.companyName = nameInput.value.trim();
+          if (websiteOk) answers.companyWebsite = websiteValue;
+
+          valid = nameOk && websiteOk && industryOk && sizeOk;
+        }
+
+        if (stepNumber === 3) {
+          const roleOk = Boolean(answers.role);
+          if (!roleOk) showGroupError('role'); else clearGroupError('role');
+          answers.heardAbout = document.getElementById('heard-about').value;
+          valid = roleOk;
+        }
+
+        if (stepNumber === 4) {
+          const challengesOk = answers.challenges.length > 0;
+          if (!challengesOk) showGroupError('challenges'); else clearGroupError('challenges');
+          valid = challengesOk;
+        }
+
+        if (stepNumber === 5) {
+          const notesInput = document.getElementById('notes');
+          answers.notes = notesInput.value.trim();
+          const notesOk = answers.notes.length <= 2000;
+          setFieldError(notesInput, !notesOk);
+          const focusOk = answers.demoFocus.length > 0;
+          if (!focusOk) showGroupError('demoFocus'); else clearGroupError('demoFocus');
+          valid = notesOk && focusOk;
+        }
+
+        if (stepNumber === 6) {
+          const dateInput = document.getElementById('preferred-date');
+          const timeInput = document.getElementById('preferred-time');
+          const tzInput = document.getElementById('timezone');
+
+          answers.preferredDate = dateInput.value;
+          answers.preferredTime = timeInput.value;
+          answers.timezone = tzInput.value;
+
+          const minDate = dateInput.min;
+          const dateOk = Boolean(answers.preferredDate) && (!minDate || answers.preferredDate >= minDate);
+          const timeOk = Boolean(answers.preferredTime);
+          const tzOk = Boolean(answers.timezone);
+          const formatOk = Boolean(answers.meetingFormat);
+
+          setFieldError(dateInput, !dateOk);
+          setFieldError(timeInput, !timeOk);
+          setFieldError(tzInput, !tzOk);
+          if (!formatOk) showGroupError('meetingFormat'); else clearGroupError('meetingFormat');
+
+          valid = dateOk && timeOk && tzOk && formatOk;
+        }
+
+        return valid;
+      }
+
+      // ---- Review recap shown before submitting ----
+      function renderReview() {
+        const rows = [
+          ['Name', answers.fullName],
+          ['Email', answers.email],
+          ['Phone', answers.phone],
+          ['Company', answers.companyName],
+          ['Website', answers.companyWebsite],
+          ['Industry', answers.industry],
+          ['Team size', answers.companySize],
+          ['Role', answers.role],
+          ['Tools today', answers.currentTools],
+          ['Challenges', answers.challenges],
+          ['Demo focus', answers.demoFocus],
+          ['Notes', answers.notes],
+          ['Date', answers.preferredDate],
+          ['Time', answers.preferredTime],
+          ['Timezone', answers.timezone],
+          ['Meeting', answers.meetingFormat]
+        ];
+        reviewRows.innerHTML = '';
+        rows.forEach(function (row) {
+          const label = row[0];
+          let value = row[1];
+          if (Array.isArray(value)) value = value.join(', ');
+          if (!value) return; // skip empty optional answers
+          const rowEl = document.createElement('div');
+          rowEl.className = 'review-row';
+          const dt = document.createElement('dt');
+          dt.textContent = label;
+          const dd = document.createElement('dd');
+          dd.textContent = value;
+          rowEl.appendChild(dt);
+          rowEl.appendChild(dd);
+          reviewRows.appendChild(rowEl);
+        });
+      }
+
+      // ---- Option card selection (single + multi select) ----
+      form.querySelectorAll('.option-grid').forEach(grid => {
+        const field = grid.dataset.field;
+        const isMulti = grid.dataset.multi === 'true';
+
+        grid.querySelectorAll('.option-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const value = card.dataset.value;
+            if (isMulti) {
+              const list = answers[field];
+              const idx = list.indexOf(value);
+              if (idx > -1) {
+                list.splice(idx, 1);
+                card.classList.remove('is-selected');
+              } else {
+                list.push(value);
+                card.classList.add('is-selected');
+              }
+            } else {
+              grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('is-selected'));
+              card.classList.add('is-selected');
+              answers[field] = value;
+            }
+            clearGroupError(field);
+          });
+        });
+      });
+
+      // ---- Next / Back navigation ----
+      form.querySelectorAll('[data-action="next"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          clearMessage();
+          if (validateStep(currentStep) && currentStep < TOTAL_STEPS) showStep(currentStep + 1);
+        });
+      });
+      form.querySelectorAll('[data-action="back"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          clearMessage();
+          if (currentStep > 1) showStep(currentStep - 1);
+        });
+      });
+
+      // ---- Submission ----
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if (!validateStep(TOTAL_STEPS)) return;
+
+        const submitBtn = form.querySelector('[data-action="submit"]');
+        if (submitBtn.classList.contains('is-loading')) return; // prevent double submit
+        submitBtn.classList.add('is-loading');
+        submitBtn.disabled = true;
+
+        try {
+          const supabase = window.getElioClient ? window.getElioClient() : null;
+          if (!supabase) throw new Error('Demo booking backend is not configured yet.');
+
+          const { data, error } = await supabase.rpc('request_demo', {
+            p_full_name: answers.fullName,
+            p_email: answers.email,
+            p_phone: answers.phone || null,
+            p_company_name: answers.companyName,
+            p_company_website: answers.companyWebsite || null,
+            p_industry: answers.industry,
+            p_company_size: answers.companySize,
+            p_role: answers.role,
+            p_heard_about: answers.heardAbout || null,
+            p_current_tools: answers.currentTools,
+            p_challenges: answers.challenges,
+            p_demo_focus: answers.demoFocus,
+            p_notes: answers.notes || null,
+            p_preferred_date: answers.preferredDate,
+            p_preferred_time: answers.preferredTime,
+            p_timezone: answers.timezone,
+            p_meeting_format: answers.meetingFormat
+          });
+          if (error) throw error;
+
+          const result = Array.isArray(data) ? data[0] : data;
+          const reference = result && result.reference_code ? result.reference_code : null;
+          if (!reference) throw new Error('Incomplete demo booking response.');
+
+          document.getElementById('confirmation-reference').textContent = reference;
+          document.getElementById('confirmation-lede').textContent =
+            'We\u2019ve got your preferred slot \u2014 ' + answers.preferredDate + ' at ' +
+            answers.preferredTime + ' (' + answers.timezone + ') \u2014 and will confirm by email within one business day.';
+
+          form.style.display = 'none';
+          document.querySelector('.progress-label').style.display = 'none';
+          document.querySelector('.progress-track').style.display = 'none';
+          confirmation.classList.add('is-visible');
+          const formCard = document.querySelector('.form-card');
+          if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+          console.error('Demo booking failed:', err);
+          if (err && err.message === 'Demo booking backend is not configured yet.') {
+            showMessage('The demo booking connection is not configured yet. Please try again later.', 'error');
+          } else if (err && err.code === '23505') {
+            showMessage('A demo request already exists for this email — check your inbox, or contact us to change the time.', 'error');
+          } else {
+            showMessage('Something went wrong while saving your request. Please try again.', 'error');
+          }
+          submitBtn.classList.remove('is-loading');
+          submitBtn.disabled = false;
+        }
+      });
+
+      // ---- Timezone: auto-detect, but let people override ----
+      function initializeTimezone() {
+        const select = document.getElementById('timezone');
+        const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        const zones = [
+          ['Africa/Lagos', 'Lagos (WAT)'],
+          ['Europe/London', 'London (GMT/BST)'],
+          ['Europe/Berlin', 'Berlin (CET/CEST)'],
+          ['America/New_York', 'New York (ET)'],
+          ['America/Chicago', 'Chicago (CT)'],
+          ['America/Los_Angeles', 'Los Angeles (PT)'],
+          ['Asia/Dubai', 'Dubai (GST)'],
+          ['Asia/Kolkata', 'Mumbai (IST)'],
+          ['Asia/Singapore', 'Singapore (SGT)'],
+          ['Australia/Sydney', 'Sydney (AET)']
+        ];
+        zones.forEach(function (zone) {
+          const option = document.createElement('option');
+          option.value = zone[0];
+          option.textContent = zone[1];
+          select.appendChild(option);
+        });
+        if (detected) {
+          const known = zones.some(function (zone) { return zone[0] === detected; });
+          const option = document.createElement('option');
+          option.value = detected;
+          option.textContent = detected.replace(/_/g, ' ') + (known ? '' : ' (auto-detected)');
+          select.insertBefore(option, select.options[1]);
+        }
+        select.value = detected || '';
+      }
+
+      // ---- Dates: nothing in the past ----
+      function initializeDateBounds() {
+        const dateInput = document.getElementById('preferred-date');
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const pad = function (n) { return String(n).padStart(2, '0'); };
+        dateInput.min = tomorrow.getFullYear() + '-' + pad(tomorrow.getMonth() + 1) + '-' + pad(tomorrow.getDate());
+      }
+
+      initializeTimezone();
+      initializeDateBounds();
+      showStep(1);
+    })();
+  </script>
+  <!-- ---- DEMO FLOW SCRIPT END ---- -->
+</body>
+</html>

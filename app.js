@@ -4,7 +4,7 @@ import { buildDailyBrief, } from './elio-agent.js';
 import { listTasks, createTask, updateTask, deleteTask } from './task-service.js';
 import { listApprovals, resolveApproval } from './approval-service.js';
 import { listActivities, logActivity } from './activity-service.js';
-import { generateFollowUp } from './ai-service.js';
+import { generateFollowUpDraft } from './follow-up-drafting-agent.js';
 import { createFollowUpWorkflow } from './follow-up-service.js';
 import { listCustomers, createCustomer, updateCustomer, deleteCustomer } from './customer-service.js';
 import { listProducts, createProduct, updateProduct, deleteProduct } from './product-service.js';
@@ -23,6 +23,7 @@ const date = value => value ? new Intl.DateTimeFormat(undefined,{month:'short',d
 const time = value => new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit'}).format(new Date(value));
 const initials = name => (name || 'E').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
 const title = page.charAt(0).toUpperCase()+page.slice(1);
+const followUpDiagnostic = (event, details = {}) => { if (window.ELIO_DEBUG_AI === true) console.debug(`[follow-up-agent] ${event}`, details); };
 
 async function boot(business) {
   document.body.innerHTML = shell(business);
@@ -148,27 +149,99 @@ function customerModal(b,done){const wrap=document.createElement('div');wrap.cla
 function followUpModal(b, customer) {
   const wrap = document.createElement('div');
   wrap.className = 'modal-backdrop';
-  wrap.innerHTML = `<div class="modal"><div class="modal-header"><div><span class="eyebrow">Elio follow-up</span><h2 style="margin-top:5px">Prepare something thoughtful.</h2><p>For ${esc(customer.name)}</p></div><button class="btn btn-quiet" data-close aria-label="Cancel">×</button></div><form><div class="field"><label>Context</label><textarea name="context" maxlength="3000" placeholder="What should Elio know about this follow-up?" required></textarea></div><div class="field"><label>Tone</label><select name="tone"><option>Friendly</option><option>Professional</option><option>Casual</option><option>Formal</option></select></div><p class="muted" data-ai-error hidden role="alert"></p><button class="btn btn-primary" type="submit">Prepare follow-up</button><p class="muted" style="margin-top:12px;font-size:12px">Nothing will be sent automatically. You will review it first.</p></form></div>`;
+  wrap.innerHTML = `<div class="modal follow-up-modal"><div class="modal-header"><div><span class="eyebrow">Elio follow-up</span><h2 style="margin-top:5px">Prepare something thoughtful.</h2><p>For ${esc(customer.name)}</p></div><button class="btn btn-quiet" data-close aria-label="Cancel">×</button></div><form><div class="field"><label for="follow-up-context">What should Elio write? <span class="muted">(required)</span></label><textarea id="follow-up-context" name="context" maxlength="3000" rows="3" required placeholder="For example: Thank them for the consultation, answer their question about the service, and invite them to choose a next step."></textarea><small class="muted">Describe what you want sent. Elio uses saved notes, activity, tasks, and previous drafts only to add relevant facts.</small></div><div class="content-grid follow-up-options"><div class="field"><label for="follow-up-purpose">What should be sent?</label><select id="follow-up-purpose" name="purpose"><option>Check in</option><option>Follow up on inquiry</option><option>Re-engage customer</option><option>After purchase</option><option>Payment reminder</option><option>Custom</option></select></div><div class="field"><label for="follow-up-tone">Tone</label><select id="follow-up-tone" name="tone"><option>Friendly</option><option>Professional</option><option>Casual</option></select></div><div class="field"><label for="follow-up-length">Length</label><select id="follow-up-length" name="length"><option>Short</option><option>Medium</option></select></div></div><div class="field follow-up-message-field"><div class="follow-up-composer-label"><label for="follow-up-message">Draft message</label><button class="btn btn-quiet follow-up-generate" data-generate type="button" disabled><span aria-hidden="true">✦</span><span data-generate-label>Generate with Elio</span></button></div><textarea id="follow-up-message" name="message" maxlength="6000" rows="7" placeholder="Your editable follow-up will appear here…"></textarea><div class="follow-up-placement" data-placement hidden><span>There is already text in the draft.</span><div class="header-actions"><button class="btn btn-secondary" data-replace type="button">Replace</button><button class="btn btn-secondary" data-insert type="button">Insert below</button><button class="btn btn-quiet" data-cancel-placement type="button">Cancel</button></div></div><p class="muted" data-draft-status hidden role="status" aria-live="polite"></p></div><p class="muted" data-ai-error hidden role="alert"></p><div class="header-actions follow-up-submit-actions"><button class="btn btn-primary" data-save type="submit" disabled>Save draft for approval</button></div><p class="muted follow-up-disclaimer">Nothing will be sent automatically. Review and edit the draft before saving it for approval.</p></form></div>`;
   openModal(wrap);
   wrap.querySelector('[data-close]').onclick = () => wrap.remove();
-  wrap.querySelector('form').onsubmit = async event => {
-    event.preventDefault();
-    const form = event.target;
-    const button = form.querySelector('button[type="submit"]');
-    const errorMessage = form.querySelector('[data-ai-error]');
-    errorMessage.hidden = true;
-    button.disabled = true;
-    button.textContent = 'Elio is preparing this…';
+  const form = wrap.querySelector('form');
+  const contextInput = form.context;
+  const message = form.message;
+  const generateButton = form.querySelector('[data-generate]');
+  const generateLabel = form.querySelector('[data-generate-label]');
+  const saveButton = form.querySelector('[data-save]');
+  const errorMessage = form.querySelector('[data-ai-error]');
+  const draftStatus = form.querySelector('[data-draft-status]');
+  const placement = form.querySelector('[data-placement]');
+  let generatedSubject = '';
+  let suggestedAction = '';
+
+  contextInput.addEventListener('input', () => {
+    if (!generateButton.getAttribute('aria-busy')) generateButton.disabled = !contextInput.value.trim();
+  });
+
+  const showError = error => {
+    errorMessage.textContent = friendlyError(error, 'Elio could not write that draft. Please try again.');
+    errorMessage.hidden = false;
+  };
+  const clearError = () => { errorMessage.hidden = true; errorMessage.textContent = ''; };
+  const requestGeneration = async placementMode => {
+    if (!contextInput.value.trim()) {
+      showError(new Error('Tell Elio what you want the message to say first.'));
+      contextInput.focus();
+      return;
+    }
+    clearError();
+    placement.hidden = true;
+    generateButton.disabled = true;
+    saveButton.disabled = true;
+    generateButton.setAttribute('aria-busy', 'true');
+    followUpDiagnostic('FOLLOW_UP_GENERATION_STARTED', { instructionLength: form.context.value.trim().length, placementMode });
+    generateLabel.textContent = 'Elio is writing...';
+    draftStatus.textContent = 'Elio is writing...';
+    draftStatus.hidden = false;
     try {
-      const result = await generateFollowUp({ customerId: customer.id, context: form.context.value, tone: form.tone.value });
-      await createFollowUpWorkflow({ businessId: b.id, customerId: customer.id, subject: result.subject, message: result.message, suggestedAction: result.suggested_action, generatedBy: 'Elio' });
+      const result = await generateFollowUpDraft({
+        customerId: customer.id,
+        instruction: form.context.value,
+        purpose: form.purpose.value,
+        tone: form.tone.value,
+        length: form.length.value
+      });
+      const draft = result.draft.trim();
+      followUpDiagnostic('DRAFT_RETURNED', { draftLength: draft.length });
+      message.value = placementMode === 'insert' && message.value.trim() ? `${message.value.trim()}\n\n${draft}` : draft;
+      followUpDiagnostic('DRAFT_INSERTED', { placementMode });
+      generatedSubject = `Follow-up with ${customer.name}`;
+      suggestedAction = form.purpose.value;
+      saveButton.disabled = false;
+      draftStatus.textContent = 'Draft ready. Review and edit it before saving.';
+      message.focus();
+    } catch (error) {
+      showError(error);
+      draftStatus.hidden = true;
+      saveButton.disabled = !message.value.trim();
+    } finally {
+      generateButton.disabled = !contextInput.value.trim();
+      generateButton.removeAttribute('aria-busy');
+      generateLabel.textContent = message.value.trim() ? 'Regenerate with Elio' : 'Generate with Elio';
+    }
+  };
+  generateButton.onclick = () => {
+    if (message.value.trim()) {
+      placement.hidden = false;
+      form.querySelector('[data-replace]').focus();
+      return;
+    }
+    requestGeneration('replace');
+  };
+  form.querySelector('[data-replace]').onclick = () => requestGeneration('replace');
+  form.querySelector('[data-insert]').onclick = () => requestGeneration('insert');
+  form.querySelector('[data-cancel-placement]').onclick = () => { placement.hidden = true; generateButton.focus(); };
+  form.onsubmit = async event => {
+    event.preventDefault();
+    clearError();
+    if (!message.value.trim()) {
+      showError(new Error('Generate a draft or enter a message before saving.'));
+      message.focus();
+      return;
+    }
+    saveButton.disabled = true;
+    try {
+      await createFollowUpWorkflow({ businessId: b.id, customerId: customer.id, subject: generatedSubject || `Follow-up with ${customer.name}`, message: message.value.trim(), suggestedAction: suggestedAction || form.purpose.value, generatedBy: 'Elio' });
       wrap.remove();
       toast('Draft created for approval.');
     } catch (error) {
-      errorMessage.textContent = friendlyError(error, 'Elio couldn’t complete that request. Please try again.');
-      errorMessage.hidden = false;
-      button.disabled = false;
-      button.textContent = 'Try again';
+      showError(error);
+      saveButton.disabled = false;
     }
   };
 }
